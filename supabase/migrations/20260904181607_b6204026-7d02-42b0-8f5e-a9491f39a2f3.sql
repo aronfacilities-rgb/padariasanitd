@@ -1,0 +1,13 @@
+REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.assign_initial_role() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.apply_inventory_movement() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.recalc_command_total() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.apply_receivable_payment() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_manager(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_staff(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_operator(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_manager(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_staff(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_operator(uuid) TO authenticated;

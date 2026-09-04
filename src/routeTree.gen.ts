@@ -10,33 +10,106 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PainelRouteImport } from './routes/_painel'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PainelCaixaRouteImport } from './routes/_painel/caixa'
+import { Route as PainelComandasRouteImport } from './routes/_painel/comandas'
+import { Route as PainelDashboardRouteImport } from './routes/_painel/dashboard'
+import { Route as PainelPdvRouteImport } from './routes/_painel/pdv'
+import { Route as PainelProdutosRouteImport } from './routes/_painel/produtos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/_painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelCaixaRoute = PainelCaixaRouteImport.update({
+  id: '/caixa',
+  path: '/caixa',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelComandasRoute = PainelComandasRouteImport.update({
+  id: '/comandas',
+  path: '/comandas',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelDashboardRoute = PainelDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelPdvRoute = PainelPdvRouteImport.update({
+  id: '/pdv',
+  path: '/pdv',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelProdutosRoute = PainelProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => PainelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/caixa': typeof PainelCaixaRoute
+  '/comandas': typeof PainelComandasRoute
+  '/dashboard': typeof PainelDashboardRoute
+  '/pdv': typeof PainelPdvRoute
+  '/produtos': typeof PainelProdutosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/caixa': typeof PainelCaixaRoute
+  '/comandas': typeof PainelComandasRoute
+  '/dashboard': typeof PainelDashboardRoute
+  '/pdv': typeof PainelPdvRoute
+  '/produtos': typeof PainelProdutosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_painel': typeof PainelRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_painel/caixa': typeof PainelCaixaRoute
+  '/_painel/comandas': typeof PainelComandasRoute
+  '/_painel/dashboard': typeof PainelDashboardRoute
+  '/_painel/pdv': typeof PainelPdvRoute
+  '/_painel/produtos': typeof PainelProdutosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/caixa' | '/comandas' | '/dashboard' | '/pdv' | '/produtos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/auth' | '/caixa' | '/comandas' | '/dashboard' | '/pdv' | '/produtos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_painel'
+    | '/auth'
+    | '/_painel/caixa'
+    | '/_painel/comandas'
+    | '/_painel/dashboard'
+    | '/_painel/pdv'
+    | '/_painel/produtos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PainelRoute: typeof PainelRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +121,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_painel': {
+      id: '/_painel'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_painel/caixa': {
+      id: '/_painel/caixa'
+      path: '/caixa'
+      fullPath: '/caixa'
+      preLoaderRoute: typeof PainelCaixaRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/_painel/comandas': {
+      id: '/_painel/comandas'
+      path: '/comandas'
+      fullPath: '/comandas'
+      preLoaderRoute: typeof PainelComandasRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/_painel/dashboard': {
+      id: '/_painel/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof PainelDashboardRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/_painel/pdv': {
+      id: '/_painel/pdv'
+      path: '/pdv'
+      fullPath: '/pdv'
+      preLoaderRoute: typeof PainelPdvRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/_painel/produtos': {
+      id: '/_painel/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof PainelProdutosRouteImport
+      parentRoute: typeof PainelRoute
+    }
   }
 }
 
+interface PainelRouteChildren {
+  PainelCaixaRoute: typeof PainelCaixaRoute
+  PainelComandasRoute: typeof PainelComandasRoute
+  PainelDashboardRoute: typeof PainelDashboardRoute
+  PainelPdvRoute: typeof PainelPdvRoute
+  PainelProdutosRoute: typeof PainelProdutosRoute
+}
+
+const PainelRouteChildren: PainelRouteChildren = {
+  PainelCaixaRoute: PainelCaixaRoute,
+  PainelComandasRoute: PainelComandasRoute,
+  PainelDashboardRoute: PainelDashboardRoute,
+  PainelPdvRoute: PainelPdvRoute,
+  PainelProdutosRoute: PainelProdutosRoute,
+}
+
+const PainelRouteWithChildren =
+  PainelRoute._addFileChildren(PainelRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PainelRoute: PainelRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
