@@ -233,7 +233,7 @@ function CaixaPage() {
         <>
           <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Valor inicial" value={brl(resumo.inicial)} />
-            <StatCard label="Vendas no caixa" value={brl(resumo.vendas)} tone="positive" />
+            <StatCard label="Vendas no caixa" value={brl(resumo.vendas)} tone="success" />
             <StatCard label="Entradas / Saídas" value={`${brl(resumo.entradas)} / ${brl(resumo.saidas)}`} />
             <StatCard
               label="Dinheiro esperado"
