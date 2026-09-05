@@ -545,3 +545,36 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
     </Sheet>
   );
 }
+
+function QtdInput({ item, onSubmit }: { item: Item; onSubmit: (valor: number) => void }) {
+  const [texto, setTexto] = useState<string>(String(Number(item.quantidade)));
+  const atual = String(Number(item.quantidade));
+
+  function confirmar() {
+    const valor = Number(texto.replace(",", "."));
+    if (!Number.isFinite(valor)) {
+      setTexto(atual);
+      return;
+    }
+    if (valor === Number(item.quantidade)) return;
+    onSubmit(valor);
+  }
+
+  return (
+    <Input
+      value={texto}
+      aria-label={`Quantidade de ${item.nome}`}
+      inputMode="decimal"
+      className="numeric h-9 w-16 text-center"
+      onChange={(e) => setTexto(e.target.value)}
+      onFocus={(e) => e.currentTarget.select()}
+      onBlur={confirmar}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+    />
+  );
+}
