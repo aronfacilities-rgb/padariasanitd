@@ -552,9 +552,15 @@ function PdvPage() {
                   className="numeric h-12 text-lg"
                   autoFocus
                 />
-                <p className="text-sm text-muted-foreground">
-                  Troco: <span className="numeric font-semibold">{brl(troco)}</span>
-                </p>
+                <div className="flex items-center justify-between rounded-lg border border-border bg-accent/40 p-3">
+                  <span className="text-sm font-medium">Troco para o cliente</span>
+                  <span className="numeric font-display text-2xl font-semibold">{brl(troco)}</span>
+                </div>
+                {Number(recebido || 0) > 0 && Number(recebido) < total ? (
+                  <p className="text-sm text-destructive">
+                    Valor recebido menor que o total ({brl(total)}).
+                  </p>
+                ) : null}
               </div>
             ) : null}
 
