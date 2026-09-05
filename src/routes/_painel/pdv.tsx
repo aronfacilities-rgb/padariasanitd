@@ -593,6 +593,28 @@ function PdvPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={cupom !== null} onOpenChange={(aberto) => !aberto && setCupom(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">Cupom da venda</DialogTitle>
+          </DialogHeader>
+          {cupom ? <Cupom data={cupom} /> : null}
+          <DialogFooter className="gap-2 sm:flex-col">
+            <Button className="h-12 w-full" onClick={() => window.print()}>
+              <Printer className="size-4" />
+              Imprimir cupom
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-full"
+              onClick={() => setCupom(null)}
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
