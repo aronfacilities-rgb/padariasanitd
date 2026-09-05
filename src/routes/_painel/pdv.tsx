@@ -7,6 +7,8 @@ import { Minus, Plus, Printer, Search, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
+import { abrirGaveta } from "@/lib/gaveta";
+
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -91,6 +93,26 @@ function PdvPage() {
   const [forma, setForma] = useState<Forma>("dinheiro");
   const [recebido, setRecebido] = useState("");
   const [clienteId, setClienteId] = useState("");
+
+  /**
+   * Aciona a gaveta antes de abrir a caixa de impressão do navegador.
+   * O comando ESC/POS só chega à Bematech pela porta serial/USB, então em
+   * navegadores sem Web Serial apenas avisamos e seguimos com a impressão.
+   */
+  async function imprimirEAbrirGaveta() {
+    const resultado = await abrirGaveta();
+    if (!resultado.ok) {
+      if (resultado.motivo === "sem-suporte") {
+        toast.info("Abertura automática da gaveta só funciona no Chrome ou Edge do computador.");
+      } else if (resultado.motivo === "sem-permissao") {
+        toast.info("Selecione a impressora Bematech na janela do navegador para abrir a gaveta.");
+      } else {
+        toast.error("Não foi possível abrir a gaveta. Verifique o cabo da impressora.");
+      }
+    }
+    window.print();
+  }
+
 
   const caixa = useQuery({
     queryKey: ["caixa-aberto"],
@@ -601,10 +623,11 @@ function PdvPage() {
           </DialogHeader>
           {cupom ? <Cupom data={cupom} /> : null}
           <DialogFooter className="gap-2 sm:flex-col">
-            <Button className="h-12 w-full" onClick={() => window.print()}>
+            <Button className="h-12 w-full" onClick={imprimirEAbrirGaveta}>
               <Printer className="size-4" />
-              Imprimir cupom
+              Imprimir cupom e abrir gaveta
             </Button>
+
             <Button
               variant="outline"
               className="h-12 w-full"
