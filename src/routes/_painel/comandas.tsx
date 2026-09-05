@@ -472,6 +472,10 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
                     >
                       <Minus className="size-4" />
                     </Button>
+                    <QtdInput
+                      item={i}
+                      onSubmit={(valor) => definirQtd.mutate({ item: i, valor })}
+                    />
                     <Button
                       variant="outline"
                       size="icon"
