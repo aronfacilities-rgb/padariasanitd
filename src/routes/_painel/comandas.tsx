@@ -335,6 +335,23 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
     onError: (e: Error) => toast.error("Erro ao atualizar", { description: e.message }),
   });
 
+  const definirQtd = useMutation({
+    mutationFn: async ({ item, valor }: { item: Item; valor: number }) => {
+      if (!Number.isFinite(valor) || valor <= 0) {
+        const { error } = await supabase.from("command_items").delete().eq("id", item.id);
+        if (error) throw error;
+        return;
+      }
+      const { error } = await supabase
+        .from("command_items")
+        .update({ quantidade: valor })
+        .eq("id", item.id);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+    onError: (e: Error) => toast.error("Erro ao atualizar", { description: e.message }),
+  });
+
   const remover = useMutation({
     mutationFn: async (itemId: string) => {
       const { error } = await supabase.from("command_items").delete().eq("id", itemId);
