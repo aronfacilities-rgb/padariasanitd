@@ -2092,7 +2092,7 @@
       "file_type": "code",
       "norm_label": "logo()",
       "source_file": "src/components/logo.tsx",
-      "source_location": "L8"
+      "source_location": "L7"
     },
     {
       "id": "src_lib_auth_useauth",
@@ -7306,7 +7306,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/logo.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -11734,7 +11734,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/components/logo.tsx",
-      "source_location": "L2",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
@@ -14506,7 +14506,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/components/logo.tsx",
-      "source_location": "L2",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
@@ -17842,7 +17842,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/logo.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -22446,5 +22446,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a29aa6c9ddd16641cd91f2eadcc2537ba00f874e"
+  "built_at_commit": "4253de9827536ce3ced67ff603ec213b4ec66df6"
 }
