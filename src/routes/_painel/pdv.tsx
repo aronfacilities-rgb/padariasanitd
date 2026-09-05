@@ -240,6 +240,21 @@ function PdvPage() {
       toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no código de barras da comanda." });
       return;
     }
+    const etiqueta = await supabase
+      .from("comanda_labels")
+      .select("numero")
+      .eq("numero", numero)
+      .maybeSingle();
+    if (etiqueta.error) {
+      toast.error("Erro ao verificar a etiqueta", { description: etiqueta.error.message });
+      return;
+    }
+    if (!etiqueta.data) {
+      toast.error(`Comanda #${numero} não está cadastrada`, {
+        description: "Cadastre a etiqueta em Configurações → Cadastro de Comandas.",
+      });
+      return;
+    }
     const { data, error } = await supabase
       .from("commands")
       .select("id, numero, status")
@@ -253,9 +268,10 @@ function PdvPage() {
       return;
     }
     if (!data) {
-      toast.error(`Comanda #${numero} não está aberta.`);
+      toast.error(`Comanda #${numero} não tem consumo em aberto.`);
       return;
     }
+
     await importarComanda(data.id);
   }
 
