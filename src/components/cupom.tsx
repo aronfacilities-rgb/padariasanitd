@@ -1,3 +1,4 @@
+import { Logo } from "@/components/logo";
 import { brl, dateTime, num } from "@/lib/format";
 
 /** Linha impressa no cupom. */
@@ -45,6 +46,7 @@ export function Cupom({ data }: { data: CupomData }) {
     <div className="mx-auto w-full max-w-[320px] bg-card px-4 py-4 text-foreground">
 
       <header className="text-center">
+        <Logo className="mx-auto mb-2 h-16" />
         <p className="font-display text-base font-semibold uppercase">{data.empresa.nome}</p>
         {data.empresa.cnpj ? (
           <p className="numeric text-[11px] text-muted-foreground">CNPJ {data.empresa.cnpj}</p>
