@@ -169,10 +169,10 @@ function CadastroComandas() {
         @page { size: A4; margin: 8mm; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
         .etiqueta { border: 1px dashed #999; border-radius: 3mm; padding: 3mm; text-align: center; page-break-inside: avoid; }
         .etiqueta img { width: 100%; height: auto; display: block; }
-        .info { margin-top: 2mm; display: flex; flex-direction: column; gap: 1mm; }
+        .info { margin-bottom: 1mm; display: flex; flex-direction: column; gap: 1mm; }
         .loja { font-size: 8pt; }
         .num { font-size: 12pt; font-weight: 700; letter-spacing: .5px; }
       </style></head><body><div class="grid">${cards}</div>
