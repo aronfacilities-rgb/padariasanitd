@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
 import { abrirGaveta } from "@/lib/gaveta";
+import { parseComandaQr } from "@/lib/comanda-qr";
 
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
