@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
 import { abrirGaveta } from "@/lib/gaveta";
-import { parseComandaQr } from "@/lib/comanda-qr";
+import { parseComandaCodigo } from "@/lib/comanda-codigo";
 
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
@@ -234,7 +234,7 @@ function PdvPage() {
    * comanda em aberto correspondente antes de importar para o PDV.
    */
   async function lerComanda(texto: string) {
-    const numero = parseComandaQr(texto);
+    const numero = parseComandaCodigo(texto);
     setLeitura("");
     if (numero === null) {
       toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no QR da comanda." });
