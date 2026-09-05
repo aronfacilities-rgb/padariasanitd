@@ -103,7 +103,7 @@ function AuthPage() {
     <main className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       <section className="relative hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-3">
-          <Logo className="h-14 rounded-xl bg-card p-1.5" />
+          <Logo className="h-24 rounded-xl bg-card p-2" />
           <div>
             <p className="font-display text-lg leading-tight">Padaria Santiago</p>
             <p className="text-xs text-sidebar-foreground/70">Gestão, comandas e PDV</p>

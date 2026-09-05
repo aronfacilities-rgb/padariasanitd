@@ -129,7 +129,7 @@ function PainelLayout() {
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-sidebar p-4 lg:flex">
         <div className="flex items-center gap-3 px-2 pb-6 pt-2">
-          <Logo className="h-11 rounded-lg bg-card p-1" />
+          <Logo className="h-16 rounded-lg bg-card p-1.5" />
           <div className="text-sidebar-foreground">
             <p className="font-display text-base leading-tight">Padaria Santiago</p>
             <p className="text-[11px] text-sidebar-foreground/60">Gestão e PDV</p>
