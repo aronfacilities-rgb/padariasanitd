@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Croissant, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -102,9 +103,7 @@ function AuthPage() {
     <main className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       <section className="relative hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-3">
-          <span className="flex size-11 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-            <Croissant className="size-6" />
-          </span>
+          <Logo className="h-14 rounded-xl bg-card p-1.5" />
           <div>
             <p className="font-display text-lg leading-tight">Padaria Santiago</p>
             <p className="text-xs text-sidebar-foreground/70">Gestão, comandas e PDV</p>
@@ -125,9 +124,7 @@ function AuthPage() {
       <section className="flex items-center justify-center px-5 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <Croissant className="size-5" />
-            </span>
+            <Logo className="h-12" />
             <p className="font-display text-lg">Padaria Santiago</p>
           </div>
 

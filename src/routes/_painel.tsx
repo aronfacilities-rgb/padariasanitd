@@ -5,7 +5,6 @@ import {
   BarChart3,
   ClipboardList,
   Clock,
-  Croissant,
   CreditCard,
   LayoutDashboard,
   Loader2,
@@ -24,6 +23,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { ROLE_LABEL, useAuth, type AppRole } from "@/lib/auth";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -129,9 +129,7 @@ function PainelLayout() {
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-sidebar p-4 lg:flex">
         <div className="flex items-center gap-3 px-2 pb-6 pt-2">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-            <Croissant className="size-5" />
-          </span>
+          <Logo className="h-11 rounded-lg bg-card p-1" />
           <div className="text-sidebar-foreground">
             <p className="font-display text-base leading-tight">Padaria Santiago</p>
             <p className="text-[11px] text-sidebar-foreground/60">Gestão e PDV</p>
@@ -158,9 +156,7 @@ function PainelLayout() {
 
       <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Croissant className="size-4.5" />
-          </span>
+          <Logo className="h-9" />
           <p className="font-display text-base">Padaria Santiago</p>
         </div>
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>

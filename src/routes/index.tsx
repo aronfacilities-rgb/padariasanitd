@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Croissant, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 import { useAuth } from "@/lib/auth";
 
@@ -39,7 +40,7 @@ function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4">
       <span className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-        <Croissant className="size-7" />
+        <Logo className="h-12" />
       </span>
       <h1 className="font-display text-2xl">Padaria Santiago</h1>
       <Loader2 className="size-5 animate-spin text-muted-foreground" />
