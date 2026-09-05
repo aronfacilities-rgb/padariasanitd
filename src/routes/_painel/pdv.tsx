@@ -237,7 +237,7 @@ function PdvPage() {
     const numero = parseComandaCodigo(texto);
     setLeitura("");
     if (numero === null) {
-      toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no QR da comanda." });
+      toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no código de barras da comanda." });
       return;
     }
     const { data, error } = await supabase
@@ -464,8 +464,8 @@ function PdvPage() {
                 <ScanLine className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   className="h-11 pl-9"
-                  placeholder="Passe o leitor no QR da comanda"
-                  aria-label="Leitura do QR code da comanda"
+                  placeholder="Passe o leitor no código de barras da comanda"
+                  aria-label="Leitura do código de barras da comanda"
                   value={leitura}
                   onChange={(e) => setLeitura(e.target.value)}
                 />
