@@ -453,6 +453,27 @@ function PdvPage() {
 
           <div className="panel p-4">
             <h2 className="font-display text-lg font-semibold">Comandas aguardando</h2>
+            <form
+              className="mt-3 flex items-center gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void lerComanda(leitura);
+              }}
+            >
+              <div className="relative flex-1">
+                <ScanLine className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  className="h-11 pl-9"
+                  placeholder="Passe o leitor no QR da comanda"
+                  aria-label="Leitura do QR code da comanda"
+                  value={leitura}
+                  onChange={(e) => setLeitura(e.target.value)}
+                />
+              </div>
+              <Button type="submit" variant="outline" className="h-11">
+                Abrir
+              </Button>
+            </form>
             {(comandas.data ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">Nenhuma comanda em aberto.</p>
             ) : (
