@@ -1,401 +1,413 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { 
-  ArrowDownRight, 
-  ArrowUpRight, 
-  Briefcase, 
-  Calendar, 
-  CheckCircle, 
-  CheckCircle2, 
-  CircleDashed, 
-  Clock, 
-  CreditCard, 
-  FileText, 
-  MoreHorizontal, 
-  PlayCircle, 
-  Search 
-} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import {
-  ResponsiveContainer, 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
+  Bar,
+  BarChart,
   CartesianGrid,
-  PieChart, 
-  Pie, 
-  Cell
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
+import { AlertTriangle, ClipboardList, Receipt, TrendingUp, Wallet } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { brl, num } from "@/lib/format";
+import { Logo } from "@/components/logo";
+import { PageHeader, StatCard } from "@/components/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_painel/dashboard")({
   head: () => ({
     meta: [
-      { title: "Project Dashboard — Workspace" },
-      { name: "description", content: "Gestão unificada de projetos, tarefas e saúde financeira." },
+      { title: "Dashboard — Padaria Santiago" },
+      {
+        name: "description",
+        content:
+          "Visão geral da padaria: vendas do dia, ticket médio, comandas abertas, caixa, fiado e estoque baixo.",
+      },
+      { property: "og:title", content: "Dashboard — Padaria Santiago" },
+      { property: "og:description", content: "Acompanhe vendas, caixa, fiado e estoque." },
     ],
   }),
-  component: DashboardSaaS,
+  component: Dashboard,
 });
 
-// --- DADOS MOCKADOS PARA APRESENTAÇÃO COMERCIAL ---
-const REVENUE_DATA = [
-  { name: "Jan", revenue: 45000, expenses: 32000 },
-  { name: "Fev", revenue: 52000, expenses: 34000 },
-  { name: "Mar", revenue: 48000, expenses: 31000 },
-  { name: "Abr", revenue: 61000, expenses: 36000 },
-  { name: "Mai", revenue: 59000, expenses: 38000 },
-  { name: "Jun", revenue: 75000, expenses: 42000 },
+type Periodo = "hoje" | "ontem" | "semana" | "mes";
+
+const PERIODOS: { key: Periodo; label: string }[] = [
+  { key: "hoje", label: "Hoje" },
+  { key: "ontem", label: "Ontem" },
+  { key: "semana", label: "Semana" },
+  { key: "mes", label: "Mês" },
 ];
 
-const STATUS_DATA = [
-  { name: "Em Andamento", value: 45, color: "#3B82F6" }, // Azul elétrico
-  { name: "Concluídos", value: 35, color: "#10B981" }, // Verde
-  { name: "Atrasados", value: 20, color: "#F97316" }, // Laranja
-];
-
-const TASKS = [
-  { id: 1, title: "Wireframing principal", project: "App Mobile", status: "done" },
-  { id: 2, title: "Reunião de kickoff", project: "SaaS Dashboard", status: "in_progress" },
-  { id: 3, title: "Revisão de copy", project: "Site Institucional", status: "pending" },
-  { id: 4, title: "Exportar assets", project: "App Mobile", status: "pending" },
-];
-
-const PROJECTS = [
-  { id: 1, name: "SaaS Dashboard", client: "Acme Corp", progress: 75, status: "active" },
-  { id: 2, name: "App Mobile", client: "Globex", progress: 40, status: "delayed" },
-  { id: 3, name: "E-commerce", client: "Stark Ind.", progress: 100, status: "completed" },
-];
-
-const INVOICES = [
-  { id: "#INV-2041", amount: "$3,450.00", status: "paid", client: "Acme Corp" },
-  { id: "#INV-2042", amount: "$1,200.00", status: "pending", client: "Globex" },
-  { id: "#INV-2043", amount: "$850.00", status: "overdue", client: "Stark Ind." },
-];
-
-// --- ESTILOS COMPARTILHADOS ---
-const cardClass = "relative overflow-hidden bg-card/70 backdrop-blur-3xl border border-border/60 shadow-[0_8px_30px_rgb(0,0,0,0.03)] rounded-[2rem] p-7 flex flex-col transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]";
-
-function DashboardSaaS() {
-  return (
-    <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out space-y-8 pb-12">
-      
-      {/* CABEÇALHO SUPERIOR */}
-      <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
-            Project Dashboard
-          </h1>
-          <p className="text-base text-muted-foreground">
-            Visão geral inteligente de projetos, acompanhamento financeiro e entregas.
-          </p>
-        </div>
-        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/70" />
-            <Input 
-              placeholder="Pesquisar em tudo..." 
-              className="w-full pl-10 rounded-full bg-card/60 border-border/80 shadow-sm h-11 focus-visible:ring-1 focus-visible:ring-primary/30"
-            />
-          </div>
-          <Button variant="outline" className="rounded-full h-11 px-5 shadow-sm bg-card/50 border-border/80 text-foreground/80 hover:bg-card/90">
-            <Calendar className="mr-2 size-4" />
-            Este Mês
-          </Button>
-        </div>
-      </header>
-
-      {/* VISÃO GERAL (CARDS) */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="Receita Total" 
-          value="$ 124.500" 
-          change="+15%" 
-          trend="up" 
-          icon={CreditCard} 
-          bgIcon="bg-blue-500/10 text-blue-600" 
-        />
-        <StatCard 
-          title="Projetos Ativos" 
-          value="12" 
-          change="+2" 
-          trend="up" 
-          icon={Briefcase} 
-          bgIcon="bg-emerald-500/10 text-emerald-600" 
-        />
-        <StatCard 
-          title="Horas Registradas" 
-          value="342h" 
-          change="-5%" 
-          trend="down" 
-          icon={Clock} 
-          bgIcon="bg-orange-500/10 text-orange-600" 
-        />
-        <StatCard 
-          title="Tarefas Concluídas" 
-          value="148" 
-          change="+12%" 
-          trend="up" 
-          icon={CheckCircle} 
-          bgIcon="bg-purple-500/10 text-purple-600" 
-        />
-      </div>
-
-      {/* GRÁFICOS PRINCIPAIS */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Receita vs Despesas */}
-        <div className={`lg:col-span-2 ${cardClass}`}>
-          <div className="mb-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <h3 className="font-display text-lg font-semibold text-foreground">
-                Receita vs. Despesas
-              </h3>
-              <p className="text-sm text-muted-foreground">Desempenho financeiro ao longo de 2024</p>
-            </div>
-            <MoreHorizontal className="size-5 text-muted-foreground/50 transition-colors hover:text-foreground cursor-pointer" />
-          </div>
-          <div className="h-[280px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={REVENUE_DATA} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" strokeOpacity={0.6} />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} 
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
-                  tickFormatter={(val) => `$${val / 1000}k`}
-                />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}
-                  formatter={(value: number) => [`$${value.toLocaleString()}`, undefined]}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  name="Receita" 
-                  stroke="#3B82F6" 
-                  strokeWidth={3} 
-                  dot={false} 
-                  activeDot={{ r: 6, strokeWidth: 0, fill: "#3B82F6" }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="expenses" 
-                  name="Despesas" 
-                  stroke="#F97316" 
-                  strokeWidth={3} 
-                  dot={false} 
-                  activeDot={{ r: 6, strokeWidth: 0, fill: "#F97316" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Status dos Projetos */}
-        <div className={cardClass}>
-           <div className="mb-6 flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold text-foreground">
-              Status dos Projetos
-            </h3>
-            <MoreHorizontal className="size-5 text-muted-foreground/50 cursor-pointer" />
-          </div>
-          <div className="relative flex-1 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={STATUS_DATA}
-                  innerRadius={70}
-                  outerRadius={90}
-                  paddingAngle={4}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {STATUS_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px -5px rgba(0,0,0,0.1)' }}
-                  itemStyle={{ fontWeight: 500 }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            {/* Center Label */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-3xl font-display font-bold">12</span>
-              <span className="text-xs text-muted-foreground font-medium">Projetos Totais</span>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 px-2">
-            {STATUS_DATA.map((item) => (
-              <div key={item.name} className="flex flex-col items-center gap-1 text-center">
-                <div className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-[10px] font-medium uppercase text-muted-foreground">{item.name}</span>
-                <span className="text-sm font-semibold">{item.value}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* LINHA INFERIOR (LISTAS) */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Visão Geral Projetos */}
-        <div className={cardClass}>
-          <div className="mb-5 flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold text-foreground">Projetos</h3>
-            <Button variant="ghost" size="icon" className="size-8">
-              <Search className="size-4" />
-            </Button>
-          </div>
-          <div className="space-y-5">
-            {PROJECTS.map((proj) => (
-              <div key={proj.id} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-sm font-semibold leading-none">{proj.name}</p>
-                    <p className="text-xs text-muted-foreground">{proj.client}</p>
-                  </div>
-                  <Badge 
-                    variant="outline"
-                    className={`rounded-lg px-2 text-[10px] uppercase tracking-wider font-semibold border-0 ${
-                      proj.status === 'active' ? 'bg-blue-500/10 text-blue-600' : 
-                      proj.status === 'completed' ? 'bg-emerald-500/10 text-emerald-600' :
-                      'bg-orange-500/10 text-orange-600'
-                    }`}
-                  >
-                    {proj.status === 'active' ? 'Ativo' : proj.status === 'completed' ? 'Finalizado' : 'Atrasado'}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Progress value={proj.progress} className="h-1.5" />
-                  <span className="text-xs font-semibold w-8 text-right">{proj.progress}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Minhas Tarefas */}
-        <div className={cardClass}>
-          <div className="mb-5 flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold text-foreground">Minhas Tarefas</h3>
-            <Button variant="ghost" size="sm" className="text-xs text-primary">Ver Todas</Button>
-          </div>
-          <div className="space-y-1">
-            {TASKS.map((task) => (
-              <div key={task.id} className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50">
-                <button className="mt-0.5 shrink-0 text-muted-foreground hover:text-emerald-500 transition-colors cursor-pointer">
-                  {task.status === "done" ? (
-                    <CheckCircle2 className="size-5 text-emerald-500" />
-                  ) : task.status === "in_progress" ? (
-                    <PlayCircle className="size-5 text-blue-500" />
-                  ) : (
-                    <CircleDashed className="size-5" />
-                  )}
-                </button>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium truncate ${task.status === 'done' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                    {task.title}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground truncate">{task.project}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Faturas (Invoices) */}
-        <div className={cardClass}>
-          <div className="mb-5 flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold text-foreground">Faturas</h3>
-            <Button variant="ghost" size="icon" className="size-8">
-              <FileText className="size-4" />
-            </Button>
-          </div>
-          <div className="space-y-4">
-            {INVOICES.map((inv) => (
-              <div key={inv.id} className="flex items-center justify-between border-b border-border/50 pb-3 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted/40">
-                    <span className="text-xs font-bold text-muted-foreground">
-                      {inv.id.replace("#INV-", "")}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">{inv.client}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{inv.id}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold">{inv.amount}</p>
-                  <p className={`text-[11px] font-medium mt-0.5 ${
-                    inv.status === 'paid' ? 'text-emerald-500' :
-                    inv.status === 'pending' ? 'text-muted-foreground' :
-                    'text-rose-500'
-                  }`}>
-                    {inv.status === 'paid' ? 'Pago' : inv.status === 'pending' ? 'Pendente' : 'Em Atraso'}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function rangeFor(periodo: Periodo): { from: Date; to: Date } {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (periodo === "hoje") return { from: start, to: now };
+  if (periodo === "ontem") {
+    const from = new Date(start);
+    from.setDate(from.getDate() - 1);
+    return { from, to: start };
+  }
+  if (periodo === "semana") {
+    const from = new Date(start);
+    from.setDate(from.getDate() - 6);
+    return { from, to: now };
+  }
+  return { from: new Date(now.getFullYear(), now.getMonth(), 1), to: now };
 }
 
-// --- COMPONENTES AUXILIARES ---
-function StatCard({
-  title,
-  value,
-  change,
-  trend,
-  icon: Icon,
-  bgIcon
-}: {
-  title: string;
-  value: string;
-  change: string;
-  trend: "up" | "down";
-  icon: React.ElementType;
-  bgIcon: string;
-}) {
+type SaleRow = { id: string; total: number; created_at: string };
+type PaymentRow = { forma: string; valor: number; created_at: string };
+type ItemRow = { nome: string; quantidade: number; total: number; created_at: string };
+
+function Dashboard() {
+  const [periodo, setPeriodo] = useState<Periodo>("hoje");
+  const { from, to } = useMemo(() => rangeFor(periodo), [periodo]);
+  const mesInicio = useMemo(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+  }, []);
+
+  const vendas = useQuery({
+    queryKey: ["dash-vendas", from.toISOString(), to.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("id, total, created_at")
+        .eq("status", "finalizada")
+        .gte("created_at", from.toISOString())
+        .lte("created_at", to.toISOString());
+      if (error) throw error;
+      return (data ?? []) as SaleRow[];
+    },
+  });
+
+  const vendasMes = useQuery({
+    queryKey: ["dash-vendas-mes", mesInicio],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("id, total, created_at")
+        .eq("status", "finalizada")
+        .gte("created_at", mesInicio);
+      if (error) throw error;
+      return (data ?? []) as SaleRow[];
+    },
+  });
+
+  const pagamentos = useQuery({
+    queryKey: ["dash-pagamentos", from.toISOString(), to.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("forma, valor, created_at")
+        .gte("created_at", from.toISOString())
+        .lte("created_at", to.toISOString());
+      if (error) throw error;
+      return (data ?? []) as PaymentRow[];
+    },
+  });
+
+  const itens = useQuery({
+    queryKey: ["dash-itens", from.toISOString(), to.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sale_items")
+        .select("nome, quantidade, total, created_at")
+        .gte("created_at", from.toISOString())
+        .lte("created_at", to.toISOString());
+      if (error) throw error;
+      return (data ?? []) as ItemRow[];
+    },
+  });
+
+  const comandasAbertas = useQuery({
+    queryKey: ["dash-comandas-abertas"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("commands")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["aberta", "em_consumo", "aguardando_pagamento"]);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const fiado = useQuery({
+    queryKey: ["dash-fiado"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("accounts_receivable")
+        .select("valor, valor_pago, vencimento, status")
+        .neq("status", "pago");
+      if (error) throw error;
+      return (data ?? []) as {
+        valor: number;
+        valor_pago: number;
+        vencimento: string | null;
+        status: string;
+      }[];
+    },
+  });
+
+  const caixa = useQuery({
+    queryKey: ["dash-caixa"],
+    queryFn: async () => {
+      const { data: reg, error } = await supabase
+        .from("cash_registers")
+        .select("id, valor_inicial, aberto_em")
+        .eq("status", "aberto")
+        .order("aberto_em", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (!reg) return null;
+      const [{ data: pays }, { data: entries }] = await Promise.all([
+        supabase.from("payments").select("forma, valor, sale_id").gte("created_at", reg.aberto_em),
+        supabase
+          .from("financial_entries")
+          .select("tipo, valor, forma_pagamento")
+          .eq("cash_register_id", reg.id),
+      ]);
+      const dinheiroVendas = (pays ?? [])
+        .filter((p) => p.forma === "dinheiro")
+        .reduce((s, p) => s + Number(p.valor), 0);
+      const entradas = (entries ?? [])
+        .filter((e) => e.tipo === "entrada" && e.forma_pagamento === "dinheiro")
+        .reduce((s, e) => s + Number(e.valor), 0);
+      const saidas = (entries ?? [])
+        .filter((e) => e.tipo === "saida" && e.forma_pagamento === "dinheiro")
+        .reduce((s, e) => s + Number(e.valor), 0);
+      return {
+        total: Number(reg.valor_inicial) + dinheiroVendas + entradas - saidas,
+      };
+    },
+  });
+
+  const estoqueBaixo = useQuery({
+    queryKey: ["dash-estoque-baixo"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, nome, estoque_atual, estoque_minimo")
+        .eq("ativo", true);
+      if (error) throw error;
+      return (data ?? []).filter(
+        (p) => Number(p.estoque_atual) <= Number(p.estoque_minimo) && Number(p.estoque_minimo) > 0,
+      );
+    },
+  });
+
+  const totalPeriodo = (vendas.data ?? []).reduce((s, v) => s + Number(v.total), 0);
+  const totalMes = (vendasMes.data ?? []).reduce((s, v) => s + Number(v.total), 0);
+  const qtdVendas = (vendas.data ?? []).length;
+  const ticket = qtdVendas > 0 ? totalPeriodo / qtdVendas : 0;
+  const produtosVendidos = (itens.data ?? []).reduce((s, i) => s + Number(i.quantidade), 0);
+  const fiadoAberto = (fiado.data ?? []).reduce(
+    (s, f) => s + (Number(f.valor) - Number(f.valor_pago)),
+    0,
+  );
+  const hojeStr = new Date().toISOString().slice(0, 10);
+  const fiadoVencido = (fiado.data ?? [])
+    .filter((f) => f.vencimento && f.vencimento < hojeStr)
+    .reduce((s, f) => s + (Number(f.valor) - Number(f.valor_pago)), 0);
+
+  const vendasPorDia = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const v of vendasMes.data ?? []) {
+      const dia = v.created_at.slice(0, 10);
+      map.set(dia, (map.get(dia) ?? 0) + Number(v.total));
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([dia, total]) => ({ dia: dia.slice(8, 10) + "/" + dia.slice(5, 7), total }));
+  }, [vendasMes.data]);
+
+  const formas = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of pagamentos.data ?? []) {
+      map.set(p.forma, (map.get(p.forma) ?? 0) + Number(p.valor));
+    }
+    return [...map.entries()].map(([forma, valor]) => ({ forma, valor }));
+  }, [pagamentos.data]);
+
+  const topProdutos = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const i of itens.data ?? []) {
+      map.set(i.nome, (map.get(i.nome) ?? 0) + Number(i.quantidade));
+    }
+    return [...map.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([nome, quantidade]) => ({ nome, quantidade }));
+  }, [itens.data]);
+
+  const chartColors = [
+    "var(--color-chart-1)",
+    "var(--color-chart-2)",
+    "var(--color-chart-3)",
+    "var(--color-chart-4)",
+    "var(--color-chart-5)",
+  ];
+
+  const carregando = vendas.isLoading || vendasMes.isLoading;
+
   return (
-    <div className={cardClass}>
-      <div className="flex items-center gap-4 pb-4">
-        <div className={`flex size-11 items-center justify-center rounded-[14px] ${bgIcon}`}>
-          <Icon className="size-5" />
-        </div>
-        <p className="text-sm font-medium text-muted-foreground/90">{title}</p>
+    <>
+      <div className="mb-4 flex justify-center lg:justify-start">
+        <Logo className="h-16" />
       </div>
-      <div className="mt-auto">
-        <p className="font-display text-[2rem] font-bold tracking-tight text-foreground">
-          {value}
-        </p>
-        <div className="mt-2 flex items-center gap-1.5 text-[13px]">
-          <div className={`flex items-center px-1.5 py-0.5 rounded gap-1 font-semibold ${
-            trend === "up" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-          }`}>
-            {trend === "up" ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-            {change}
+      <PageHeader
+        title="Dashboard"
+        description="Resumo da operação da padaria."
+        actions={
+          <div className="flex flex-wrap gap-2">
+            {PERIODOS.map((p) => (
+              <Button
+                key={p.key}
+                size="sm"
+                variant={periodo === p.key ? "default" : "outline"}
+                onClick={() => setPeriodo(p.key)}
+              >
+                {p.label}
+              </Button>
+            ))}
           </div>
-          <span className="text-muted-foreground ml-1">vs período pass.</span>
+        }
+      />
+
+      {carregando ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Vendas do período"
+            value={brl(totalPeriodo)}
+            hint={`${qtdVendas} venda(s)`}
+            tone="success"
+            icon={<TrendingUp className="size-4" />}
+          />
+          <StatCard label="Vendas do mês" value={brl(totalMes)} icon={<Receipt className="size-4" />} />
+          <StatCard label="Ticket médio" value={brl(ticket)} />
+          <StatCard
+            label="Comandas abertas"
+            value={num(comandasAbertas.data ?? 0, 0)}
+            icon={<ClipboardList className="size-4" />}
+            tone="info"
+          />
+          <StatCard label="Produtos vendidos" value={num(produtosVendidos, 2)} />
+          <StatCard label="Fiado em aberto" value={brl(fiadoAberto)} tone="warning" />
+          <StatCard label="Fiado vencido" value={brl(fiadoVencido)} tone="danger" />
+          <StatCard
+            label="Caixa atual"
+            value={caixa.data ? brl(caixa.data.total) : "Caixa fechado"}
+            icon={<Wallet className="size-4" />}
+          />
+        </div>
+      )}
+
+      {(estoqueBaixo.data?.length ?? 0) > 0 ? (
+        <div className="panel mt-4 flex items-start gap-3 border-warning/40 bg-warning/10 p-4">
+          <AlertTriangle className="mt-0.5 size-5 text-warning" />
+          <div>
+            <p className="font-medium">
+              {estoqueBaixo.data?.length} produto(s) com estoque baixo
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {estoqueBaixo.data
+                ?.slice(0, 6)
+                .map((p) => `${p.nome} (${num(p.estoque_atual, 2)})`)
+                .join(" · ")}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="panel p-4 lg:col-span-2">
+          <p className="font-display text-base">Vendas por dia (mês atual)</p>
+          <div className="mt-4 h-64">
+            {vendasPorDia.length === 0 ? (
+              <p className="pt-16 text-center text-sm text-muted-foreground">
+                Nenhuma venda registrada neste mês.
+              </p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={vendasPorDia}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis dataKey="dia" fontSize={12} stroke="var(--color-muted-foreground)" />
+                  <YAxis fontSize={12} stroke="var(--color-muted-foreground)" />
+                  <Tooltip formatter={(v: number) => brl(v)} />
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    stroke="var(--color-chart-1)"
+                    strokeWidth={2.5}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-4">
+          <p className="font-display text-base">Formas de pagamento</p>
+          <div className="mt-4 h-64">
+            {formas.length === 0 ? (
+              <p className="pt-16 text-center text-sm text-muted-foreground">
+                Sem pagamentos no período.
+              </p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={formas} dataKey="valor" nameKey="forma" outerRadius={90} label>
+                    {formas.map((_, i) => (
+                      <Cell key={i} fill={chartColors[i % chartColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v: number) => brl(v)} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-4 lg:col-span-3">
+          <p className="font-display text-base">Produtos mais vendidos no período</p>
+          <div className="mt-4 h-64">
+            {topProdutos.length === 0 ? (
+              <p className="pt-16 text-center text-sm text-muted-foreground">
+                Nenhum produto vendido no período.
+              </p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={topProdutos}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis dataKey="nome" fontSize={12} stroke="var(--color-muted-foreground)" />
+                  <YAxis fontSize={12} stroke="var(--color-muted-foreground)" />
+                  <Tooltip />
+                  <Bar dataKey="quantidade" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
