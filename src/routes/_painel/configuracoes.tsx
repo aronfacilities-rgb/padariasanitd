@@ -226,13 +226,13 @@ function CadastroComandas() {
               <Printer className="size-4" /> Imprimir etiquetas
             </Button>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {etiquetas.map((e) => (
               <div key={e.numero} className="rounded-xl border border-border p-3 text-center">
                 <img
                   src={e.dataUrl}
-                  alt={`QR code da comanda ${e.numero}`}
-                  className="mx-auto w-full max-w-[140px] rounded-md bg-white p-1"
+                  alt={`Código de barras da comanda ${e.numero}`}
+                  className="mx-auto w-full max-w-[240px] rounded-md bg-white p-1"
                 />
                 <p className="numeric mt-2 text-sm font-semibold">COMANDA {e.numero}</p>
               </div>
