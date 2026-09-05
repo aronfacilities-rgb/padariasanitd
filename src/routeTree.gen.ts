@@ -14,6 +14,7 @@ import { Route as PainelRouteImport } from './routes/_painel'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PainelCaixaRouteImport } from './routes/_painel/caixa'
 import { Route as PainelComandasRouteImport } from './routes/_painel/comandas'
+import { Route as PainelConfiguracoesRouteImport } from './routes/_painel/configuracoes'
 import { Route as PainelDashboardRouteImport } from './routes/_painel/dashboard'
 import { Route as PainelEstoqueRouteImport } from './routes/_painel/estoque'
 import { Route as PainelPdvRouteImport } from './routes/_painel/pdv'
@@ -43,6 +44,11 @@ const PainelComandasRoute = PainelComandasRouteImport.update({
   path: '/comandas',
   getParentRoute: () => PainelRoute,
 } as any)
+const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => PainelRoute,
+} as any)
 const PainelDashboardRoute = PainelDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/caixa': typeof PainelCaixaRoute
   '/comandas': typeof PainelComandasRoute
+  '/configuracoes': typeof PainelConfiguracoesRoute
   '/dashboard': typeof PainelDashboardRoute
   '/estoque': typeof PainelEstoqueRoute
   '/pdv': typeof PainelPdvRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/caixa': typeof PainelCaixaRoute
   '/comandas': typeof PainelComandasRoute
+  '/configuracoes': typeof PainelConfiguracoesRoute
   '/dashboard': typeof PainelDashboardRoute
   '/estoque': typeof PainelEstoqueRoute
   '/pdv': typeof PainelPdvRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_painel/caixa': typeof PainelCaixaRoute
   '/_painel/comandas': typeof PainelComandasRoute
+  '/_painel/configuracoes': typeof PainelConfiguracoesRoute
   '/_painel/dashboard': typeof PainelDashboardRoute
   '/_painel/estoque': typeof PainelEstoqueRoute
   '/_painel/pdv': typeof PainelPdvRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/caixa'
     | '/comandas'
+    | '/configuracoes'
     | '/dashboard'
     | '/estoque'
     | '/pdv'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/caixa'
     | '/comandas'
+    | '/configuracoes'
     | '/dashboard'
     | '/estoque'
     | '/pdv'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_painel/caixa'
     | '/_painel/comandas'
+    | '/_painel/configuracoes'
     | '/_painel/dashboard'
     | '/_painel/estoque'
     | '/_painel/pdv'
@@ -173,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelComandasRouteImport
       parentRoute: typeof PainelRoute
     }
+    '/_painel/configuracoes': {
+      id: '/_painel/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof PainelConfiguracoesRouteImport
+      parentRoute: typeof PainelRoute
+    }
     '/_painel/dashboard': {
       id: '/_painel/dashboard'
       path: '/dashboard'
@@ -207,6 +226,7 @@ declare module '@tanstack/react-router' {
 interface PainelRouteChildren {
   PainelCaixaRoute: typeof PainelCaixaRoute
   PainelComandasRoute: typeof PainelComandasRoute
+  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
   PainelDashboardRoute: typeof PainelDashboardRoute
   PainelEstoqueRoute: typeof PainelEstoqueRoute
   PainelPdvRoute: typeof PainelPdvRoute
@@ -216,6 +236,7 @@ interface PainelRouteChildren {
 const PainelRouteChildren: PainelRouteChildren = {
   PainelCaixaRoute: PainelCaixaRoute,
   PainelComandasRoute: PainelComandasRoute,
+  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
   PainelDashboardRoute: PainelDashboardRoute,
   PainelEstoqueRoute: PainelEstoqueRoute,
   PainelPdvRoute: PainelPdvRoute,
