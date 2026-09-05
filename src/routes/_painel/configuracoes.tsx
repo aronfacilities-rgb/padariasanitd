@@ -52,6 +52,9 @@ type Etiqueta = {
  * e qualquer leitor comum de caixa consegue ler.
  */
 function gerarCodigoBarras(codigo: string): string {
+  // Renderização no servidor não tem canvas: devolve vazio e a imagem só
+  // aparece depois da hidratação, no navegador.
+  if (typeof document === "undefined") return "";
   const canvas = document.createElement("canvas");
   JsBarcode(canvas, codigo, {
     format: "CODE128",
