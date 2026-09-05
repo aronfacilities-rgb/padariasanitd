@@ -90,6 +90,7 @@ function PdvPage() {
   const [carrinho, setCarrinho] = useState<Linha[]>([]);
   const [desconto, setDesconto] = useState(0);
   const [comandaId, setComandaId] = useState<string | null>(null);
+  const [leitura, setLeitura] = useState("");
   const [pagando, setPagando] = useState(false);
   const [forma, setForma] = useState<Forma>("dinheiro");
   const [recebido, setRecebido] = useState("");
