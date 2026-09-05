@@ -2,12 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Minus, Plus, Printer, Search, Trash2 } from "lucide-react";
+import { Minus, Plus, Printer, ScanLine, Search, Trash2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
 import { abrirGaveta } from "@/lib/gaveta";
+import { parseComandaQr } from "@/lib/comanda-qr";
 
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
@@ -89,6 +90,7 @@ function PdvPage() {
   const [carrinho, setCarrinho] = useState<Linha[]>([]);
   const [desconto, setDesconto] = useState(0);
   const [comandaId, setComandaId] = useState<string | null>(null);
+  const [leitura, setLeitura] = useState("");
   const [pagando, setPagando] = useState(false);
   const [forma, setForma] = useState<Forma>("dinheiro");
   const [recebido, setRecebido] = useState("");
@@ -224,6 +226,37 @@ function PdvPage() {
     );
     setComandaId(id);
     toast.success("Comanda importada para o PDV");
+  }
+
+  /**
+   * Recebe o texto lido pelo leitor de QR colado na comanda física.
+   * O leitor funciona como teclado, então validamos o payload e buscamos a
+   * comanda em aberto correspondente antes de importar para o PDV.
+   */
+  async function lerComanda(texto: string) {
+    const numero = parseComandaQr(texto);
+    setLeitura("");
+    if (numero === null) {
+      toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no QR da comanda." });
+      return;
+    }
+    const { data, error } = await supabase
+      .from("commands")
+      .select("id, numero, status")
+      .eq("numero", numero)
+      .in("status", ["aberta", "em_consumo", "aguardando_pagamento"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      toast.error("Erro ao buscar a comanda", { description: error.message });
+      return;
+    }
+    if (!data) {
+      toast.error(`Comanda #${numero} não está aberta.`);
+      return;
+    }
+    await importarComanda(data.id);
   }
 
   const finalizar = useMutation({
@@ -420,6 +453,27 @@ function PdvPage() {
 
           <div className="panel p-4">
             <h2 className="font-display text-lg font-semibold">Comandas aguardando</h2>
+            <form
+              className="mt-3 flex items-center gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void lerComanda(leitura);
+              }}
+            >
+              <div className="relative flex-1">
+                <ScanLine className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  className="h-11 pl-9"
+                  placeholder="Passe o leitor no QR da comanda"
+                  aria-label="Leitura do QR code da comanda"
+                  value={leitura}
+                  onChange={(e) => setLeitura(e.target.value)}
+                />
+              </div>
+              <Button type="submit" variant="outline" className="h-11">
+                Abrir
+              </Button>
+            </form>
             {(comandas.data ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">Nenhuma comanda em aberto.</p>
             ) : (
