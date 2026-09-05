@@ -129,13 +129,8 @@ function CadastroComandas() {
     try {
       const lista: Etiqueta[] = [];
       for (let n = inicio; n <= fim; n += 1) {
-        const dataUrl = await QRCodeLib.toDataURL(comandaQrPayload(n), {
-          errorCorrectionLevel: "M",
-          margin: 1,
-          width: 320,
-          color: { dark: "#000000", light: "#ffffff" },
-        });
-        lista.push({ numero: n, dataUrl });
+        const codigo = comandaCodigo(n);
+        lista.push({ numero: n, codigo, dataUrl: gerarCodigoBarras(codigo) });
       }
       setEtiquetas(lista);
     } catch (error) {
