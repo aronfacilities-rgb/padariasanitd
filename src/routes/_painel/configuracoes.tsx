@@ -184,10 +184,11 @@ function CadastroComandas() {
   return (
     <div className="space-y-4">
       <div className="panel p-4">
-        <h2 className="font-display text-lg font-semibold">Etiquetas com QR code</h2>
+        <h2 className="font-display text-lg font-semibold">Etiquetas com código de barras</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Informe a faixa de números das comandas físicas. Cole a etiqueta em cada comanda: ao
-          passar o leitor no caixa, a comanda é aberta automaticamente no PDV.
+          Informe a faixa de números das comandas físicas. Cada etiqueta traz o código completo
+          (ex.: CMD000012). Cole em cada comanda: ao passar o leitor no caixa, a comanda é aberta
+          automaticamente no PDV.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <div>
@@ -209,7 +210,7 @@ function CadastroComandas() {
             />
           </div>
           <Button className="h-11" onClick={() => void gerar()} disabled={gerando}>
-            {gerando ? <Loader2 className="size-4 animate-spin" /> : <QrCode className="size-4" />}
+            {gerando ? <Loader2 className="size-4 animate-spin" /> : <Barcode className="size-4" />}
             Gerar etiquetas
           </Button>
         </div>
