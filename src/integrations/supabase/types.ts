@@ -167,6 +167,30 @@ export type Database = {
         }
         Relationships: []
       }
+      comanda_labels: {
+        Row: {
+          codigo: string
+          created_at: string
+          created_by: string | null
+          id: string
+          numero: number
+        }
+        Insert: {
+          codigo: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          numero: number
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          numero?: number
+        }
+        Relationships: []
+      }
       command_items: {
         Row: {
           command_id: string

@@ -52,6 +52,9 @@ type Etiqueta = {
  * e qualquer leitor comum de caixa consegue ler.
  */
 function gerarCodigoBarras(codigo: string): string {
+  // Renderização no servidor não tem canvas: devolve vazio e a imagem só
+  // aparece depois da hidratação, no navegador.
+  if (typeof document === "undefined") return "";
   const canvas = document.createElement("canvas");
   JsBarcode(canvas, codigo, {
     format: "CODE128",
@@ -90,11 +93,15 @@ function ConfiguracoesPage() {
   );
 }
 
+type ComandaLabel = {
+  numero: number;
+  codigo: string;
+};
+
 function CadastroComandas() {
+  const qc = useQueryClient();
   const [de, setDe] = useState("1");
-  const [ate, setAte] = useState("1");
-  const [etiquetas, setEtiquetas] = useState<Etiqueta[]>([]);
-  const [gerando, setGerando] = useState(false);
+  const [ate, setAte] = useState("20");
 
   const empresa = useQuery({
     queryKey: ["config-empresa"],
@@ -110,56 +117,71 @@ function CadastroComandas() {
     staleTime: 5 * 60 * 1000,
   });
 
-  async function gerar() {
-    const inicio = Number(de);
-    const fim = Number(ate || de);
-    if (!Number.isInteger(inicio) || inicio < 1) {
-      toast.error("Informe um número de comanda válido.");
-      return;
-    }
-    if (!Number.isInteger(fim) || fim < inicio) {
-      toast.error("O número final deve ser maior ou igual ao inicial.");
-      return;
-    }
-    if (fim - inicio + 1 > 200) {
-      toast.error("Gere no máximo 200 etiquetas por vez.");
-      return;
-    }
-    setGerando(true);
-    try {
-      const lista: Etiqueta[] = [];
-      for (let n = inicio; n <= fim; n += 1) {
-        const codigo = comandaCodigo(n);
-        lista.push({ numero: n, codigo, dataUrl: gerarCodigoBarras(codigo) });
+  /** Etiquetas já cadastradas: são permanentes e nunca mudam de código. */
+  const labels = useQuery({
+    queryKey: ["comanda-labels"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comanda_labels")
+        .select("numero, codigo")
+        .order("numero");
+      if (error) throw error;
+      return (data ?? []) as ComandaLabel[];
+    },
+  });
+
+  const cadastrar = useMutation({
+    mutationFn: async () => {
+      const inicio = Number(de);
+      const fim = Number(ate || de);
+      if (!Number.isInteger(inicio) || inicio < 1) {
+        throw new Error("Informe um número de comanda válido.");
       }
-      setEtiquetas(lista);
-    } catch (error) {
-      toast.error("Não foi possível gerar as etiquetas", {
-        description: error instanceof Error ? error.message : undefined,
-      });
-    } finally {
-      setGerando(false);
-    }
-  }
+      if (!Number.isInteger(fim) || fim < inicio) {
+        throw new Error("O número final deve ser maior ou igual ao inicial.");
+      }
+      if (fim - inicio + 1 > 200) {
+        throw new Error("Cadastre no máximo 200 etiquetas por vez.");
+      }
+      const existentes = new Set((labels.data ?? []).map((l) => l.numero));
+      const novos = [];
+      for (let n = inicio; n <= fim; n += 1) {
+        if (!existentes.has(n)) novos.push({ numero: n, codigo: comandaCodigo(n) });
+      }
+      if (novos.length === 0) {
+        throw new Error("Essa faixa já está cadastrada.");
+      }
+      const { error } = await supabase.from("comanda_labels").insert(novos);
+      if (error) throw error;
+      return novos.length;
+    },
+    onSuccess: (quantidade) => {
+      toast.success(`${quantidade} etiqueta(s) cadastrada(s) definitivamente`);
+      void qc.invalidateQueries({ queryKey: ["comanda-labels"] });
+    },
+    onError: (error: Error) => {
+      toast.error("Não foi possível cadastrar", { description: error.message });
+    },
+  });
 
   /**
    * Imprime em uma janela isolada: a página do sistema já usa regras de
    * impressão dedicadas ao cupom de 80 mm, então uma janela própria evita
    * conflito de estilos e permite folha A4 com várias etiquetas.
    */
-  function imprimir() {
-    if (etiquetas.length === 0) return;
+  function imprimir(lista: ComandaLabel[]) {
+    if (lista.length === 0) return;
     const janela = window.open("", "_blank", "width=900,height=700");
     if (!janela) {
       toast.error("Libere as janelas pop-up do navegador para imprimir.");
       return;
     }
     const nome = empresa.data?.nome || "Padaria Santiago";
-    const cards = etiquetas
+    const cards = lista
       .map(
         (e) => `<div class="etiqueta">
             <div class="info"><span class="loja">${nome}</span><span class="num">COMANDA ${e.numero}</span></div>
-            <img src="${e.dataUrl}" alt="Codigo de barras da comanda ${e.numero}" />
+            <img src="${gerarCodigoBarras(e.codigo)}" alt="Codigo de barras da comanda ${e.numero}" />
           </div>`,
       )
       .join("");
@@ -181,14 +203,16 @@ function CadastroComandas() {
     janela.document.close();
   }
 
+  const cadastradas = labels.data ?? [];
+
   return (
     <div className="space-y-4">
       <div className="panel p-4">
-        <h2 className="font-display text-lg font-semibold">Etiquetas com código de barras</h2>
+        <h2 className="font-display text-lg font-semibold">Cadastrar comandas físicas</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Informe a faixa de números das comandas físicas. Cada etiqueta traz o código completo
-          (ex.: CMD000012). Cole em cada comanda: ao passar o leitor no caixa, a comanda é aberta
-          automaticamente no PDV.
+          Informe a faixa de números (ex.: 1 a 20). As etiquetas ficam registradas para sempre e o
+          código impresso nunca muda nem expira. Cole cada etiqueta na comanda: ao passar o leitor
+          no caixa, tudo que foi lançado naquela comanda aparece no PDV com o valor a cobrar.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <div>
@@ -209,41 +233,63 @@ function CadastroComandas() {
               onChange={(e) => setAte(e.target.value.replace(/\D/g, ""))}
             />
           </div>
-          <Button className="h-11" onClick={() => void gerar()} disabled={gerando}>
-            {gerando ? <Loader2 className="size-4 animate-spin" /> : <Barcode className="size-4" />}
-            Gerar etiquetas
+          <Button className="h-11" onClick={() => cadastrar.mutate()} disabled={cadastrar.isPending}>
+            {cadastrar.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Barcode className="size-4" />
+            )}
+            Cadastrar etiquetas
           </Button>
         </div>
       </div>
 
-      {etiquetas.length > 0 ? (
-        <div className="panel p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-display text-base font-semibold">
-              {etiquetas.length} etiqueta{etiquetas.length > 1 ? "s" : ""} pronta
-              {etiquetas.length > 1 ? "s" : ""}
-            </h3>
-            <Button variant="outline" onClick={imprimir}>
-              <Printer className="size-4" /> Imprimir etiquetas
-            </Button>
-          </div>
+      <div className="panel p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="font-display text-base font-semibold">
+            Etiquetas cadastradas ({cadastradas.length})
+          </h3>
+          <Button
+            variant="outline"
+            onClick={() => imprimir(cadastradas)}
+            disabled={cadastradas.length === 0}
+          >
+            <Printer className="size-4" /> Imprimir todas
+          </Button>
+        </div>
+        {labels.isLoading ? (
+          <Skeleton className="mt-4 h-40 rounded-xl" />
+        ) : cadastradas.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Nenhuma etiqueta cadastrada ainda. Cadastre a faixa acima para começar.
+          </p>
+        ) : (
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {etiquetas.map((e) => (
+            {cadastradas.map((e) => (
               <div key={e.numero} className="rounded-xl border border-border p-3 text-center">
+                <p className="numeric text-sm font-semibold">COMANDA {e.numero}</p>
                 <img
-                  src={e.dataUrl}
+                  src={gerarCodigoBarras(e.codigo)}
                   alt={`Código de barras da comanda ${e.numero}`}
-                  className="mx-auto w-full max-w-[240px] rounded-md bg-white p-1"
+                  className="mx-auto mt-2 w-full max-w-[240px] rounded-md bg-white p-1"
                 />
-                <p className="numeric mt-2 text-sm font-semibold">COMANDA {e.numero}</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => imprimir([e])}
+                >
+                  <Printer className="size-4" /> Imprimir esta
+                </Button>
               </div>
             ))}
           </div>
-        </div>
-      ) : null}
+        )}
+      </div>
     </div>
   );
 }
+
 
 function DadosEmpresa() {
   const qc = useQueryClient();
