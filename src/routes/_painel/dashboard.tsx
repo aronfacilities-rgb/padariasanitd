@@ -19,6 +19,7 @@ import { AlertTriangle, ClipboardList, Receipt, TrendingUp, Wallet } from "lucid
 
 import { supabase } from "@/integrations/supabase/client";
 import { brl, num } from "@/lib/format";
+import { Logo } from "@/components/logo";
 import { PageHeader, StatCard } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -263,6 +264,9 @@ function Dashboard() {
 
   return (
     <>
+      <div className="mb-4 flex justify-center lg:justify-start">
+        <Logo className="h-16" />
+      </div>
       <PageHeader
         title="Dashboard"
         description="Resumo da operação da padaria."
