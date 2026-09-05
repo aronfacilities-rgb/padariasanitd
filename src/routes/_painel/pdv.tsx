@@ -147,6 +147,20 @@ function PdvPage() {
     },
   });
 
+  const empresa = useQuery({
+    queryKey: ["config-empresa"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("system_settings")
+        .select("empresa")
+        .eq("id", "default")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.empresa ?? {}) as EmpresaConfig;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const subtotal = useMemo(
     () => carrinho.reduce((s, l) => s + l.quantidade * l.preco, 0),
     [carrinho],
