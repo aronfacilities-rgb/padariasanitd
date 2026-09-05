@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Minus, Plus, Search, Trash2 } from "lucide-react";
+import { Minus, Plus, Printer, Search, Trash2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { Cupom, type CupomData } from "@/components/cupom";
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -70,8 +72,17 @@ const FORMAS: { valor: Forma; label: string }[] = [
   { valor: "fiado", label: "Fiado" },
 ];
 
+type EmpresaConfig = {
+  nome?: string;
+  cnpj?: string | null;
+  endereco?: string | null;
+  telefone?: string | null;
+};
+
 function PdvPage() {
   const qc = useQueryClient();
+  const { profile } = useAuth();
+  const [cupom, setCupom] = useState<CupomData | null>(null);
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState<Linha[]>([]);
   const [desconto, setDesconto] = useState(0);
@@ -134,6 +145,20 @@ function PdvPage() {
       if (error) throw error;
       return (data ?? []) as { id: string; nome: string }[];
     },
+  });
+
+  const empresa = useQuery({
+    queryKey: ["config-empresa"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("system_settings")
+        .select("empresa")
+        .eq("id", "default")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.empresa ?? {}) as EmpresaConfig;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const subtotal = useMemo(
@@ -259,10 +284,40 @@ function PdvPage() {
         if (cmdErro) throw cmdErro;
       }
 
-      return venda.numero as number;
+      // Snapshot da venda para o cupom, montado antes de limpar o carrinho.
+      const comprovante: CupomData = {
+        numero: venda.numero as number,
+        emitidoEm: new Date().toISOString(),
+        itens: carrinho.map((l) => ({
+          nome: l.nome,
+          quantidade: l.quantidade,
+          preco: l.preco,
+        })),
+        subtotal,
+        desconto,
+        total,
+        forma,
+        recebido: forma === "dinheiro" ? Number(recebido || total) : total,
+        troco: forma === "dinheiro" ? troco : 0,
+        cliente:
+          forma === "fiado"
+            ? ((clientes.data ?? []).find((c) => c.id === clienteId)?.nome ?? null)
+            : null,
+        operador: profile?.nome ?? null,
+        empresa: {
+          nome: empresa.data?.nome ?? "Padaria Santiago",
+          cnpj: empresa.data?.cnpj ?? null,
+          endereco: empresa.data?.endereco ?? null,
+          telefone: empresa.data?.telefone ?? null,
+        },
+      };
+      return comprovante;
     },
-    onSuccess: (numero) => {
-      toast.success(`Venda #${numero} finalizada`, { description: `Total ${brl(total)}` });
+    onSuccess: (comprovante) => {
+      toast.success(`Venda #${comprovante.numero} finalizada`, {
+        description: `Total ${brl(comprovante.total)}`,
+      });
+      setCupom(comprovante);
       setCarrinho([]);
       setDesconto(0);
       setComandaId(null);
@@ -497,9 +552,15 @@ function PdvPage() {
                   className="numeric h-12 text-lg"
                   autoFocus
                 />
-                <p className="text-sm text-muted-foreground">
-                  Troco: <span className="numeric font-semibold">{brl(troco)}</span>
-                </p>
+                <div className="flex items-center justify-between rounded-lg border border-border bg-accent/40 p-3">
+                  <span className="text-sm font-medium">Troco para o cliente</span>
+                  <span className="numeric font-display text-2xl font-semibold">{brl(troco)}</span>
+                </div>
+                {Number(recebido || 0) > 0 && Number(recebido) < total ? (
+                  <p className="text-sm text-destructive">
+                    Valor recebido menor que o total ({brl(total)}).
+                  </p>
+                ) : null}
               </div>
             ) : null}
 
@@ -528,6 +589,28 @@ function PdvPage() {
               onClick={() => finalizar.mutate()}
             >
               {finalizar.isPending ? "Finalizando..." : "Confirmar venda"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={cupom !== null} onOpenChange={(aberto) => !aberto && setCupom(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">Cupom da venda</DialogTitle>
+          </DialogHeader>
+          {cupom ? <Cupom data={cupom} /> : null}
+          <DialogFooter className="gap-2 sm:flex-col">
+            <Button className="h-12 w-full" onClick={() => window.print()}>
+              <Printer className="size-4" />
+              Imprimir cupom
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-full"
+              onClick={() => setCupom(null)}
+            >
+              Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
