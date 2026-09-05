@@ -601,10 +601,11 @@ function PdvPage() {
           </DialogHeader>
           {cupom ? <Cupom data={cupom} /> : null}
           <DialogFooter className="gap-2 sm:flex-col">
-            <Button className="h-12 w-full" onClick={() => window.print()}>
+            <Button className="h-12 w-full" onClick={imprimirEAbrirGaveta}>
               <Printer className="size-4" />
-              Imprimir cupom
+              Imprimir cupom e abrir gaveta
             </Button>
+
             <Button
               variant="outline"
               className="h-12 w-full"
