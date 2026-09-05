@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Printer, QrCode, Save } from "lucide-react";
-import QRCodeLib from "qrcode";
+import { Barcode, Loader2, Printer, Save } from "lucide-react";
+import JsBarcode from "jsbarcode";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { comandaQrPayload } from "@/lib/comanda-qr";
+import { comandaCodigo } from "@/lib/comanda-codigo";
 
 export const Route = createFileRoute("/_painel/configuracoes")({
   head: () => ({
@@ -42,8 +42,30 @@ type EmpresaConfig = {
 
 type Etiqueta = {
   numero: number;
+  codigo: string;
   dataUrl: string;
 };
+
+/**
+ * Desenha o código de barras CODE128 em um canvas e devolve a imagem.
+ * CODE128 aceita letras e números, então cabe o código completo "CMD000012"
+ * e qualquer leitor comum de caixa consegue ler.
+ */
+function gerarCodigoBarras(codigo: string): string {
+  const canvas = document.createElement("canvas");
+  JsBarcode(canvas, codigo, {
+    format: "CODE128",
+    width: 2,
+    height: 70,
+    displayValue: true,
+    fontSize: 16,
+    textMargin: 2,
+    margin: 6,
+    background: "#ffffff",
+    lineColor: "#000000",
+  });
+  return canvas.toDataURL("image/png");
+}
 
 function ConfiguracoesPage() {
   return (
@@ -107,13 +129,8 @@ function CadastroComandas() {
     try {
       const lista: Etiqueta[] = [];
       for (let n = inicio; n <= fim; n += 1) {
-        const dataUrl = await QRCodeLib.toDataURL(comandaQrPayload(n), {
-          errorCorrectionLevel: "M",
-          margin: 1,
-          width: 320,
-          color: { dark: "#000000", light: "#ffffff" },
-        });
-        lista.push({ numero: n, dataUrl });
+        const codigo = comandaCodigo(n);
+        lista.push({ numero: n, codigo, dataUrl: gerarCodigoBarras(codigo) });
       }
       setEtiquetas(lista);
     } catch (error) {
@@ -141,8 +158,8 @@ function CadastroComandas() {
     const cards = etiquetas
       .map(
         (e) => `<div class="etiqueta">
-            <img src="${e.dataUrl}" alt="QR code da comanda ${e.numero}" />
             <div class="info"><span class="loja">${nome}</span><span class="num">COMANDA ${e.numero}</span></div>
+            <img src="${e.dataUrl}" alt="Codigo de barras da comanda ${e.numero}" />
           </div>`,
       )
       .join("");
@@ -152,10 +169,10 @@ function CadastroComandas() {
         @page { size: A4; margin: 8mm; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
         .etiqueta { border: 1px dashed #999; border-radius: 3mm; padding: 3mm; text-align: center; page-break-inside: avoid; }
         .etiqueta img { width: 100%; height: auto; display: block; }
-        .info { margin-top: 2mm; display: flex; flex-direction: column; gap: 1mm; }
+        .info { margin-bottom: 1mm; display: flex; flex-direction: column; gap: 1mm; }
         .loja { font-size: 8pt; }
         .num { font-size: 12pt; font-weight: 700; letter-spacing: .5px; }
       </style></head><body><div class="grid">${cards}</div>
@@ -167,10 +184,11 @@ function CadastroComandas() {
   return (
     <div className="space-y-4">
       <div className="panel p-4">
-        <h2 className="font-display text-lg font-semibold">Etiquetas com QR code</h2>
+        <h2 className="font-display text-lg font-semibold">Etiquetas com código de barras</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Informe a faixa de números das comandas físicas. Cole a etiqueta em cada comanda: ao
-          passar o leitor no caixa, a comanda é aberta automaticamente no PDV.
+          Informe a faixa de números das comandas físicas. Cada etiqueta traz o código completo
+          (ex.: CMD000012). Cole em cada comanda: ao passar o leitor no caixa, a comanda é aberta
+          automaticamente no PDV.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <div>
@@ -192,7 +210,7 @@ function CadastroComandas() {
             />
           </div>
           <Button className="h-11" onClick={() => void gerar()} disabled={gerando}>
-            {gerando ? <Loader2 className="size-4 animate-spin" /> : <QrCode className="size-4" />}
+            {gerando ? <Loader2 className="size-4 animate-spin" /> : <Barcode className="size-4" />}
             Gerar etiquetas
           </Button>
         </div>
@@ -209,13 +227,13 @@ function CadastroComandas() {
               <Printer className="size-4" /> Imprimir etiquetas
             </Button>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {etiquetas.map((e) => (
               <div key={e.numero} className="rounded-xl border border-border p-3 text-center">
                 <img
                   src={e.dataUrl}
-                  alt={`QR code da comanda ${e.numero}`}
-                  className="mx-auto w-full max-w-[140px] rounded-md bg-white p-1"
+                  alt={`Código de barras da comanda ${e.numero}`}
+                  className="mx-auto w-full max-w-[240px] rounded-md bg-white p-1"
                 />
                 <p className="numeric mt-2 text-sm font-semibold">COMANDA {e.numero}</p>
               </div>
