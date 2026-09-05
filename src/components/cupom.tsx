@@ -42,10 +42,8 @@ const LABEL_FORMA: Record<string, string> = {
  */
 export function Cupom({ data }: { data: CupomData }) {
   return (
-    <div
-      id="cupom-print"
-      className="mx-auto w-full max-w-[320px] bg-card px-4 py-4 text-foreground"
-    >
+    <div className="mx-auto w-full max-w-[320px] bg-card px-4 py-4 text-foreground">
+
       <header className="text-center">
         <p className="font-display text-base font-semibold uppercase">{data.empresa.nome}</p>
         {data.empresa.cnpj ? (
