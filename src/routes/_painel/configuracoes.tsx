@@ -158,8 +158,8 @@ function CadastroComandas() {
     const cards = etiquetas
       .map(
         (e) => `<div class="etiqueta">
-            <img src="${e.dataUrl}" alt="QR code da comanda ${e.numero}" />
             <div class="info"><span class="loja">${nome}</span><span class="num">COMANDA ${e.numero}</span></div>
+            <img src="${e.dataUrl}" alt="Codigo de barras da comanda ${e.numero}" />
           </div>`,
       )
       .join("");
