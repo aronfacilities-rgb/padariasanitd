@@ -92,6 +92,26 @@ function PdvPage() {
   const [recebido, setRecebido] = useState("");
   const [clienteId, setClienteId] = useState("");
 
+  /**
+   * Aciona a gaveta antes de abrir a caixa de impressão do navegador.
+   * O comando ESC/POS só chega à Bematech pela porta serial/USB, então em
+   * navegadores sem Web Serial apenas avisamos e seguimos com a impressão.
+   */
+  async function imprimirEAbrirGaveta() {
+    const resultado = await abrirGaveta();
+    if (!resultado.ok) {
+      if (resultado.motivo === "sem-suporte") {
+        toast.info("Abertura automática da gaveta só funciona no Chrome ou Edge do computador.");
+      } else if (resultado.motivo === "sem-permissao") {
+        toast.info("Selecione a impressora Bematech na janela do navegador para abrir a gaveta.");
+      } else {
+        toast.error("Não foi possível abrir a gaveta. Verifique o cabo da impressora.");
+      }
+    }
+    window.print();
+  }
+
+
   const caixa = useQuery({
     queryKey: ["caixa-aberto"],
     queryFn: async () => {
