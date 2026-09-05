@@ -9,7 +9,6 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/auth")({
@@ -61,44 +60,6 @@ function AuthPage() {
     void navigate({ to: "/dashboard" });
   }
 
-  async function cadastrar(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const nome = String(form.get("nome") ?? "").trim();
-    const email = String(form.get("email") ?? "").trim();
-    const senha = String(form.get("senha") ?? "");
-    if (nome.length < 3) {
-      toast.error("Informe o nome completo");
-      return;
-    }
-    if (senha.length < 6) {
-      toast.error("A senha deve ter ao menos 6 caracteres");
-      return;
-    }
-    setBusy(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      options: { data: { nome }, emailRedirectTo: window.location.origin },
-    });
-    if (error) {
-      setBusy(false);
-      toast.error("Não foi possível cadastrar", { description: error.message });
-      return;
-    }
-    if (data.session) {
-      await supabase
-        .from("profiles")
-        .upsert({ id: data.session.user.id, nome, email }, { onConflict: "id" });
-      toast.success("Conta criada com sucesso");
-      await router.invalidate();
-      void navigate({ to: "/dashboard" });
-    } else {
-      toast.success("Conta criada. Confirme o e-mail para entrar.");
-    }
-    setBusy(false);
-  }
-
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       <section className="relative hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
@@ -133,81 +94,41 @@ function AuthPage() {
             Use o e-mail e a senha cadastrados pela administração.
           </p>
 
-          <Tabs defaultValue="entrar" className="mt-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="entrar">Entrar</TabsTrigger>
-              <TabsTrigger value="criar">Criar acesso</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="entrar">
-              <form onSubmit={entrar} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Usuário / e-mail</Label>
-                  <Input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    autoComplete="username"
-                    required
-                    className="h-12"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-senha">Senha</Label>
-                  <Input
-                    id="login-senha"
-                    name="senha"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="h-12"
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Checkbox
-                    checked={lembrar}
-                    onCheckedChange={(v) => setLembrar(v === true)}
-                    aria-label="Lembrar acesso"
-                  />
-                  Lembrar acesso
-                </label>
-                <Button type="submit" className="h-12 w-full text-base" disabled={busy}>
-                  {busy ? <Loader2 className="size-4 animate-spin" /> : "Entrar"}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="criar">
-              <form onSubmit={cadastrar} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="novo-nome">Nome completo</Label>
-                  <Input id="novo-nome" name="nome" required className="h-12" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="novo-email">E-mail</Label>
-                  <Input id="novo-email" name="email" type="email" required className="h-12" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nova-senha">Senha</Label>
-                  <Input
-                    id="nova-senha"
-                    name="senha"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="h-12"
-                  />
-                </div>
-                <Button type="submit" className="h-12 w-full text-base" disabled={busy}>
-                  {busy ? <Loader2 className="size-4 animate-spin" /> : "Criar acesso"}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  O primeiro acesso criado recebe permissão de administrador. Os demais entram como
-                  funcionário até que a administração ajuste as permissões.
-                </p>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <form onSubmit={entrar} className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="login-email">Usuário / e-mail</Label>
+              <Input
+                id="login-email"
+                name="email"
+                type="email"
+                autoComplete="username"
+                required
+                className="h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="login-senha">Senha</Label>
+              <Input
+                id="login-senha"
+                name="senha"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="h-12"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Checkbox
+                checked={lembrar}
+                onCheckedChange={(v) => setLembrar(v === true)}
+                aria-label="Lembrar acesso"
+              />
+              Lembrar acesso
+            </label>
+            <Button type="submit" className="h-12 w-full text-base" disabled={busy}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : "Entrar"}
+            </Button>
+          </form>
         </div>
       </section>
     </main>
