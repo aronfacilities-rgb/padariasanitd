@@ -42,8 +42,30 @@ type EmpresaConfig = {
 
 type Etiqueta = {
   numero: number;
+  codigo: string;
   dataUrl: string;
 };
+
+/**
+ * Desenha o código de barras CODE128 em um canvas e devolve a imagem.
+ * CODE128 aceita letras e números, então cabe o código completo "CMD000012"
+ * e qualquer leitor comum de caixa consegue ler.
+ */
+function gerarCodigoBarras(codigo: string): string {
+  const canvas = document.createElement("canvas");
+  JsBarcode(canvas, codigo, {
+    format: "CODE128",
+    width: 2,
+    height: 70,
+    displayValue: true,
+    fontSize: 16,
+    textMargin: 2,
+    margin: 6,
+    background: "#ffffff",
+    lineColor: "#000000",
+  });
+  return canvas.toDataURL("image/png");
+}
 
 function ConfiguracoesPage() {
   return (
