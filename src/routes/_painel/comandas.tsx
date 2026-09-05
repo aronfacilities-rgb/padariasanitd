@@ -473,6 +473,7 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
                       <Minus className="size-4" />
                     </Button>
                     <QtdInput
+                      key={`${i.id}-${i.quantidade}`}
                       item={i}
                       onSubmit={(valor) => definirQtd.mutate({ item: i, valor })}
                     />
