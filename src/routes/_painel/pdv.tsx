@@ -7,6 +7,8 @@ import { Minus, Plus, Printer, Search, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
+import { abrirGaveta } from "@/lib/gaveta";
+
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
