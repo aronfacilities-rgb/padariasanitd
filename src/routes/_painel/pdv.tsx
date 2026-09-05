@@ -226,6 +226,37 @@ function PdvPage() {
     toast.success("Comanda importada para o PDV");
   }
 
+  /**
+   * Recebe o texto lido pelo leitor de QR colado na comanda física.
+   * O leitor funciona como teclado, então validamos o payload e buscamos a
+   * comanda em aberto correspondente antes de importar para o PDV.
+   */
+  async function lerComanda(texto: string) {
+    const numero = parseComandaQr(texto);
+    setLeitura("");
+    if (numero === null) {
+      toast.error("Etiqueta não reconhecida", { description: "Passe o leitor no QR da comanda." });
+      return;
+    }
+    const { data, error } = await supabase
+      .from("commands")
+      .select("id, numero, status")
+      .eq("numero", numero)
+      .in("status", ["aberta", "em_consumo", "aguardando_pagamento"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      toast.error("Erro ao buscar a comanda", { description: error.message });
+      return;
+    }
+    if (!data) {
+      toast.error(`Comanda #${numero} não está aberta.`);
+      return;
+    }
+    await importarComanda(data.id);
+  }
+
   const finalizar = useMutation({
     mutationFn: async () => {
       if (!caixa.data) throw new Error("Abra o caixa antes de vender.");
