@@ -41,7 +41,7 @@ export type ResultadoGaveta =
   | { ok: false; motivo: "sem-suporte" | "sem-permissao" | "falha" };
 
 function temWebSerial(): boolean {
-  return typeof navigator !== "undefined" && "serial" in navigator;
+  return typeof navigator !== "undefined" && serialApi() !== null;
 }
 
 /** Indica se o navegador atual consegue acionar a gaveta. */
@@ -49,11 +49,13 @@ export function gavetaDisponivel(): boolean {
   return temWebSerial();
 }
 
-async function obterPorta(): Promise<SerialPort | null> {
+async function obterPorta(): Promise<SerialPortLike | null> {
   if (portaAutorizada) return portaAutorizada;
 
-  const serial = navigator.serial;
+  const serial = serialApi();
+  if (!serial) return null;
   const jaAutorizadas = await serial.getPorts();
+
   if (jaAutorizadas.length > 0) {
     portaAutorizada = jaAutorizadas[0] ?? null;
     if (portaAutorizada) return portaAutorizada;
