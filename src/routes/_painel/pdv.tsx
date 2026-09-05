@@ -72,8 +72,17 @@ const FORMAS: { valor: Forma; label: string }[] = [
   { valor: "fiado", label: "Fiado" },
 ];
 
+type EmpresaConfig = {
+  nome?: string;
+  cnpj?: string | null;
+  endereco?: string | null;
+  telefone?: string | null;
+};
+
 function PdvPage() {
   const qc = useQueryClient();
+  const { profile } = useAuth();
+  const [cupom, setCupom] = useState<CupomData | null>(null);
   const [busca, setBusca] = useState("");
   const [carrinho, setCarrinho] = useState<Linha[]>([]);
   const [desconto, setDesconto] = useState(0);
