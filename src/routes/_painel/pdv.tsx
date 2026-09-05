@@ -389,6 +389,11 @@ function PdvPage() {
         description: `Total ${brl(comprovante.total)}`,
       });
       setCupom(comprovante);
+      // Impressão automática: espera o cupom entrar no DOM (#cupom-print)
+      // antes de acionar a gaveta e abrir a caixa de impressão do navegador.
+      window.setTimeout(() => {
+        void imprimirEAbrirGaveta();
+      }, 350);
       setCarrinho([]);
       setDesconto(0);
       setComandaId(null);
