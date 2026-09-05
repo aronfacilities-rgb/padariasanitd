@@ -615,6 +615,8 @@ function PdvPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CupomPrintArea data={cupom} />
     </>
   );
 }
