@@ -134,3 +134,22 @@ function Row({
     </div>
   );
 }
+
+/**
+ * Cópia do cupom mantida fora do diálogo, posicionada fora da tela.
+ * O diálogo do Radix fica em um portal com rolagem própria e `aria-hidden`
+ * no restante da página, o que fazia a impressão sair em branco/cortada.
+ * A regra `@media print` em styles.css reposiciona este bloco em 80mm.
+ */
+export function CupomPrintArea({ data }: { data: CupomData | null }) {
+  if (!data) return null;
+  return (
+    <div
+      id="cupom-print"
+      aria-hidden="true"
+      className="pointer-events-none fixed top-0 left-[-9999px] w-[80mm] bg-card px-4 py-4 text-foreground print:left-0"
+    >
+      <Cupom data={data} />
+    </div>
+  );
+}
