@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Printer, QrCode, Save } from "lucide-react";
-import QRCodeLib from "qrcode";
+import { Barcode, Loader2, Printer, Save } from "lucide-react";
+import JsBarcode from "jsbarcode";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { comandaQrPayload } from "@/lib/comanda-qr";
+import { comandaCodigo } from "@/lib/comanda-codigo";
 
 export const Route = createFileRoute("/_painel/configuracoes")({
   head: () => ({
