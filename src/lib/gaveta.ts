@@ -11,8 +11,25 @@
  *  - ESC p m t1 t2 -> comando ESC/POS padrão de "drawer kick"
  */
 
+/** Tipos mínimos da Web Serial API (ainda ausentes na lib padrão do TS). */
+interface SerialPortLike {
+  readonly writable: WritableStream<Uint8Array> | null;
+  open(options: { baudRate: number }): Promise<void>;
+}
+
+interface SerialLike {
+  getPorts(): Promise<SerialPortLike[]>;
+  requestPort(): Promise<SerialPortLike>;
+}
+
+function serialApi(): SerialLike | null {
+  const nav = navigator as Navigator & { serial?: SerialLike };
+  return nav.serial ?? null;
+}
+
 /** Porta já autorizada pelo operador, reaproveitada nas próximas vendas. */
-let portaAutorizada: SerialPort | null = null;
+let portaAutorizada: SerialPortLike | null = null;
+
 
 const COMANDOS = new Uint8Array([
   0x1b, 0x76, 0x32, // ESC v 50 (Bematech)
