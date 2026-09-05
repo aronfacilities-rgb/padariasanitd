@@ -284,10 +284,40 @@ function PdvPage() {
         if (cmdErro) throw cmdErro;
       }
 
-      return venda.numero as number;
+      // Snapshot da venda para o cupom, montado antes de limpar o carrinho.
+      const comprovante: CupomData = {
+        numero: venda.numero as number,
+        emitidoEm: new Date().toISOString(),
+        itens: carrinho.map((l) => ({
+          nome: l.nome,
+          quantidade: l.quantidade,
+          preco: l.preco,
+        })),
+        subtotal,
+        desconto,
+        total,
+        forma,
+        recebido: forma === "dinheiro" ? Number(recebido || total) : total,
+        troco: forma === "dinheiro" ? troco : 0,
+        cliente:
+          forma === "fiado"
+            ? ((clientes.data ?? []).find((c) => c.id === clienteId)?.nome ?? null)
+            : null,
+        operador: profile?.nome ?? null,
+        empresa: {
+          nome: empresa.data?.nome ?? "Padaria Santiago",
+          cnpj: empresa.data?.cnpj ?? null,
+          endereco: empresa.data?.endereco ?? null,
+          telefone: empresa.data?.telefone ?? null,
+        },
+      };
+      return comprovante;
     },
-    onSuccess: (numero) => {
-      toast.success(`Venda #${numero} finalizada`, { description: `Total ${brl(total)}` });
+    onSuccess: (comprovante) => {
+      toast.success(`Venda #${comprovante.numero} finalizada`, {
+        description: `Total ${brl(comprovante.total)}`,
+      });
+      setCupom(comprovante);
       setCarrinho([]);
       setDesconto(0);
       setComandaId(null);
