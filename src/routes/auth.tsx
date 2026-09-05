@@ -62,24 +62,32 @@ function AuthPage() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
-      <section className="relative hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
-        <div className="flex items-center gap-3">
-          <Logo className="h-24 rounded-xl bg-card p-2" />
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex">
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom_right,var(--color-sidebar-accent)_0%,transparent_50%,var(--color-primary)_150%)] opacity-20" />
+        <div className="relative z-10 flex items-center gap-4">
+          <Logo className="h-16 w-16 rounded-2xl bg-card p-3 shadow-2xl" />
           <div>
-            <p className="font-display text-lg leading-tight">Padaria Santiago</p>
-            <p className="text-xs text-sidebar-foreground/70">Gestão, comandas e PDV</p>
+            <p className="font-display text-2xl font-semibold leading-tight text-sidebar-primary-foreground">
+              Padaria Santiago
+            </p>
+            <p className="mt-1 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/60">
+              Gestão, comandas e PDV
+            </p>
           </div>
         </div>
-        <div className="max-w-md space-y-4">
-          <h1 className="font-display text-4xl leading-tight">
-            Do balcão ao caixa, tudo no mesmo lugar.
+        <div className="relative z-10 max-w-md space-y-6">
+          <h1 className="font-display text-5xl font-bold leading-[1.1] text-sidebar-primary-foreground">
+            Do balcão ao caixa,<br /> tudo no mesmo lugar.
           </h1>
-          <p className="text-sm text-sidebar-foreground/75">
+          <p className="text-lg leading-relaxed text-sidebar-foreground/80">
             Abra comandas pelo celular, feche a venda no caixa, controle estoque, fiado, ponto e
             relatórios com rastreabilidade completa.
           </p>
         </div>
-        <p className="text-xs text-sidebar-foreground/60">Acesso restrito à equipe.</p>
+        <div className="relative z-10 flex items-center gap-2 text-sm text-sidebar-foreground/50">
+          <span className="flex size-2 rounded-full bg-success" />
+          Sistema operando na nuvem
+        </div>
       </section>
 
       <section className="flex items-center justify-center px-5 py-12">

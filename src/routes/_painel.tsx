@@ -138,15 +138,24 @@ function PainelLayout() {
         <div className="flex-1 overflow-y-auto">
           <NavLinks />
         </div>
-        <div className="mt-4 rounded-lg bg-sidebar-accent p-3 text-sidebar-accent-foreground">
-          <p className="truncate text-sm font-medium">{profile?.nome || "Funcionário"}</p>
-          <p className="text-[11px] text-sidebar-foreground/70">
-            {roles.map((r) => ROLE_LABEL[r]).join(" · ")}
-          </p>
+        <div className="mt-4 rounded-xl bg-sidebar-accent/40 p-1">
+          <div className="flex items-center gap-3 p-2">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary/20 text-sidebar-primary-foreground">
+              <Users className="size-4.5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-sidebar-accent-foreground">
+                {profile?.nome || "Funcionário"}
+              </p>
+              <p className="truncate text-[11px] text-sidebar-foreground/60">
+                {roles.map((r) => ROLE_LABEL[r]).join(" · ")}
+              </p>
+            </div>
+          </div>
           <Button
             variant="ghost"
             size="sm"
-            className="mt-2 w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar hover:text-sidebar-foreground"
+            className="w-full justify-start gap-2 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             onClick={() => void signOut()}
           >
             <LogOut className="size-4" /> Sair
