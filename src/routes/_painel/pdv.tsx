@@ -6,7 +6,7 @@ import { Minus, Plus, Printer, Search, Trash2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Cupom, type CupomData } from "@/components/cupom";
+import { Cupom, CupomPrintArea, type CupomData } from "@/components/cupom";
 import { brl, num } from "@/lib/format";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -615,6 +615,8 @@ function PdvPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CupomPrintArea data={cupom} />
     </>
   );
 }

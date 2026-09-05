@@ -42,10 +42,8 @@ const LABEL_FORMA: Record<string, string> = {
  */
 export function Cupom({ data }: { data: CupomData }) {
   return (
-    <div
-      id="cupom-print"
-      className="mx-auto w-full max-w-[320px] bg-card px-4 py-4 text-foreground"
-    >
+    <div className="mx-auto w-full max-w-[320px] bg-card px-4 py-4 text-foreground">
+
       <header className="text-center">
         <p className="font-display text-base font-semibold uppercase">{data.empresa.nome}</p>
         {data.empresa.cnpj ? (
@@ -133,6 +131,25 @@ function Row({
     <div className={destaque ? "flex justify-between text-sm font-semibold" : "flex justify-between"}>
       <dt className={destaque ? "" : "text-muted-foreground"}>{termo}</dt>
       <dd>{valor}</dd>
+    </div>
+  );
+}
+
+/**
+ * Cópia do cupom mantida fora do diálogo, posicionada fora da tela.
+ * O diálogo do Radix fica em um portal com rolagem própria e `aria-hidden`
+ * no restante da página, o que fazia a impressão sair em branco/cortada.
+ * A regra `@media print` em styles.css reposiciona este bloco em 80mm.
+ */
+export function CupomPrintArea({ data }: { data: CupomData | null }) {
+  if (!data) return null;
+  return (
+    <div
+      id="cupom-print"
+      aria-hidden="true"
+      className="pointer-events-none fixed top-0 left-[-9999px] w-[80mm] bg-card px-4 py-4 text-foreground print:left-0"
+    >
+      <Cupom data={data} />
     </div>
   );
 }
