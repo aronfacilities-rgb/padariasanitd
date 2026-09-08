@@ -301,7 +301,7 @@
       "file_type": "code",
       "norm_label": "navitem",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L34"
+      "source_location": "L14"
     },
     {
       "id": "src_routes_painel_pdv_empresaconfig",
@@ -1210,7 +1210,7 @@
       "file_type": "code",
       "norm_label": "painellayout()",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L65"
+      "source_location": "L34"
     },
     {
       "id": "src_lib_error_capture_consumelastcapturederror",
@@ -2985,7 +2985,7 @@
       "file_type": "code",
       "norm_label": "mobile_keys",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L63"
+      "source_location": "L32"
     },
     {
       "id": "src_routes_painel_nav",
@@ -2995,7 +2995,7 @@
       "file_type": "code",
       "norm_label": "nav",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L41"
+      "source_location": "L15"
     },
     {
       "id": "src_routes_painel_pdv",
@@ -5025,7 +5025,7 @@
       "file_type": "code",
       "norm_label": "route",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L30"
+      "source_location": "L12"
     },
     {
       "id": "src_routes_root",
@@ -10653,18 +10653,6 @@
     },
     {
       "source": "src_routes_painel_painellayout",
-      "target": "src_lib_utils_cn",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L113",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel_painellayout",
       "target": "src_lib_auth_useauth",
       "relation": "calls",
       "_origin": "ast",
@@ -10672,7 +10660,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L66",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel_painellayout",
+      "target": "src_lib_utils_cn",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -13233,78 +13233,6 @@
     },
     {
       "source": "src_routes_painel",
-      "target": "src_lib_utils_cn",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_lib_auth_approle",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_lib_auth_role_label",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_lib_auth_useauth",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L25",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_components_logo_logo",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L26",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_components_ui_button_button",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
       "target": "src_components_ui_sheet_sheetcontent",
       "relation": "imports",
       "_origin": "ast",
@@ -13312,7 +13240,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L28",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -13324,7 +13252,79 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L28",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_lib_utils_cn",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_lib_auth_approle",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_lib_auth_role_label",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_lib_auth_useauth",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_components_logo_logo",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
+      "target": "src_components_ui_button_button",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -17930,6 +17930,18 @@
     },
     {
       "source": "src_routes_painel",
+      "target": "src_components_ui_sheet",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
       "target": "ref_react",
       "relation": "imports_from",
       "_origin": "ast",
@@ -17942,6 +17954,18 @@
     },
     {
       "source": "src_routes_painel",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/routes/_painel.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_routes_painel",
       "target": "src_lib_utils",
       "relation": "imports_from",
       "_origin": "ast",
@@ -17949,7 +17973,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L24",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -17961,7 +17985,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L25",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -17973,7 +17997,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L26",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -17985,31 +18009,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "src_components_ui_sheet",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L28",
-      "weight": 1.0
-    },
-    {
-      "source": "src_routes_painel",
-      "target": "ref_lucide_react",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/routes/_painel.tsx",
-      "source_location": "L3",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -24633,7 +24633,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L30",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -24644,7 +24644,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L34",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -24655,7 +24655,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L41",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -24666,7 +24666,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L63",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
@@ -25975,7 +25975,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "src/routes/_painel.tsx",
-      "source_location": "L31",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -26148,5 +26148,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "08346b36212bef05308b2f7a1493dd9010fcdc94"
+  "built_at_commit": "dc0ce6e81414d5a05f6c6ef310782d07d30bc04b"
 }
