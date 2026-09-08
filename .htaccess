@@ -1,0 +1,13 @@
+# Caso a sua hospedagem Plesk utilize servidor Linux (Apache + Phusion Passenger para Node.js)
+PassengerAppType node
+PassengerStartupFile app.js
+
+# Redireciona o tráfego e lida com as rotas do lado do servidor (SSR)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Ignora arquivos reais já existentes
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  # Envia demais requisições para o script do servidor
+  RewriteRule . /app.js [L]
+</IfModule>
