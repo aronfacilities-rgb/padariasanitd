@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Archive, BarChart3, ClipboardList, Clock, CreditCard, LayoutDashboard, Loader2, LogOut, Menu, Minus, Package, Plus, ScrollText, Settings, ShieldCheck, ShoppingCart, Users, Wallet,
+  Archive, ArrowRightLeft, BarChart3, ClipboardList, Clock, CreditCard, LayoutDashboard, Loader2, LogOut, Menu, Minus, Package, Plus, ScrollText, Settings, ShieldCheck, ShoppingCart, Users, Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROLE_LABEL, useAuth, type AppRole } from "@/lib/auth";
@@ -19,8 +19,7 @@ const NAV: NavItem[] = [
   { to: "/caixa", label: "Caixa", icon: Wallet, roles: ["admin", "gerente", "caixa"] },
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/estoque", label: "Estoque", icon: Archive, roles: ["admin", "gerente", "caixa"] },
-  { to: "/entradas", label: "Entradas", icon: Plus, roles: ["admin", "gerente", "caixa"] },
-  { to: "/saidas", label: "Saídas", icon: Minus, roles: ["admin", "gerente", "caixa"] },
+  { to: "/lancamentos", label: "Lançamentos", icon: ArrowRightLeft, roles: ["admin", "gerente", "caixa"] },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/fiado", label: "Fiado", icon: CreditCard, roles: ["admin", "gerente", "caixa"] },
   { to: "/funcionarios", label: "Funcionários", icon: Users, roles: ["admin", "gerente"] },
