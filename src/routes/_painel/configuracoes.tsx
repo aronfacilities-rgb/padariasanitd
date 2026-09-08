@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Barcode, Loader2, Printer, Save } from "lucide-react";
+import { Barcode, Loader2, Pencil, Printer, Save, Trash2, UserPlus } from "lucide-react";
 import JsBarcode from "jsbarcode";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -40,20 +40,27 @@ type EmpresaConfig = {
   telefone?: string | null;
 };
 
-type Etiqueta = {
+type ComandaLabel = {
   numero: number;
   codigo: string;
-  dataUrl: string;
 };
+
+type Employee = {
+  id: string;
+  nome: string;
+  email: string | null;
+  telefone: string | null;
+  cargo: string | null;
+  ativo: boolean;
+  roles: string[];
+};
+
+const employeeRoles = ["admin", "gerente", "caixa", "atendente"] as const;
 
 /**
  * Desenha o código de barras CODE128 em um canvas e devolve a imagem.
- * CODE128 aceita letras e números, então cabe o código completo "CMD000012"
- * e qualquer leitor comum de caixa consegue ler.
  */
 function gerarCodigoBarras(codigo: string): string {
-  // Renderização no servidor não tem canvas: devolve vazio e a imagem só
-  // aparece depois da hidratação, no navegador.
   if (typeof document === "undefined") return "";
   const canvas = document.createElement("canvas");
   JsBarcode(canvas, codigo, {
@@ -75,13 +82,17 @@ function ConfiguracoesPage() {
     <>
       <PageHeader
         title="Configurações"
-        description="Dados da empresa e cadastro de comandas com etiquetas QR code."
+        description="Dados da empresa, gestão de funcionários e cadastro de comandas."
       />
-      <Tabs defaultValue="comandas">
+      <Tabs defaultValue="funcionarios">
         <TabsList>
+          <TabsTrigger value="funcionarios">Funcionários</TabsTrigger>
           <TabsTrigger value="comandas">Cadastro de Comandas</TabsTrigger>
           <TabsTrigger value="empresa">Empresa</TabsTrigger>
         </TabsList>
+        <TabsContent value="funcionarios" className="mt-4">
+          <Funcionarios />
+        </TabsContent>
         <TabsContent value="comandas" className="mt-4">
           <CadastroComandas />
         </TabsContent>
@@ -92,23 +103,6 @@ function ConfiguracoesPage() {
     </>
   );
 }
-
-type ComandaLabel = {
-  numero: number;
-  codigo: string;
-};
-
-type Employee = {
-  id: string;
-  nome: string;
-  email: string | null;
-  telefone: string | null;
-  cargo: string | null;
-  ativo: boolean;
-  roles: string[];
-};
-
-const employeeRoles = ["admin", "gerente", "caixa", "atendente"] as const;
 
 function Funcionarios() {
   const qc = useQueryClient();
@@ -164,6 +158,21 @@ function Funcionarios() {
     await qc.invalidateQueries({ queryKey: ["funcionarios"] });
   }
 
+  async function excluir(employee: Employee) {
+    if (!window.confirm(`Tem certeza que deseja EXCLUIR o funcionário ${employee.nome}? Isso pode não ser possível se houver transações vinculadas.`)) {
+      return;
+    }
+    await supabase.from("user_roles").delete().eq("user_id", employee.id);
+    const { error } = await supabase.from("profiles").delete().eq("id", employee.id);
+    if (error) {
+      toast.error("Não foi possível excluir", { description: "Esse usuário possui registros associados ou vínculos imutáveis. Tente desativá-lo." });
+      return;
+    }
+    toast.success("Funcionário excluído permanentemente.");
+    if (editing?.id === employee.id) limpar();
+    await qc.invalidateQueries({ queryKey: ["funcionarios"] });
+  }
+
   async function alternarAtivo(employee: Employee) {
     const { error } = await supabase.from("profiles").update({ ativo: !employee.ativo }).eq("id", employee.id);
     if (error) { toast.error("Não foi possível alterar o status", { description: error.message }); return; }
@@ -178,20 +187,96 @@ function Funcionarios() {
   return (
     <div className="space-y-4">
       <div className="panel space-y-3 p-4">
-        <div className="flex items-center gap-2"><UserPlus className="size-5 text-primary" /><h2 className="font-display text-lg font-semibold">{editing ? "Editar funcionário" : "Cadastrar funcionário"}</h2></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div><Label htmlFor="funcionario-nome">Nome</Label><Input id="funcionario-nome" value={nome} onChange={(event) => setNome(event.target.value)} /></div>
-          <div><Label htmlFor="funcionario-email">E-mail</Label><Input id="funcionario-email" type="email" value={email} disabled={Boolean(editing)} onChange={(event) => setEmail(event.target.value)} /></div>
-          <div><Label htmlFor="funcionario-telefone">Telefone</Label><Input id="funcionario-telefone" value={telefone} onChange={(event) => setTelefone(event.target.value)} /></div>
-          <div><Label htmlFor="funcionario-cargo">Cargo</Label><Input id="funcionario-cargo" value={cargo} onChange={(event) => setCargo(event.target.value)} /></div>
-          {!editing && <div><Label htmlFor="funcionario-senha">Senha inicial</Label><Input id="funcionario-senha" type="password" value={senha} onChange={(event) => setSenha(event.target.value)} placeholder="Mínimo de 6 caracteres" /></div>}
-          <div><Label htmlFor="funcionario-nivel">Nível de acesso</Label><select id="funcionario-nivel" value={role} onChange={(event) => setRole(event.target.value as (typeof employeeRoles)[number])} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"><option value="admin">Administrador</option><option value="gerente">Gerente</option><option value="caixa">Caixa</option><option value="atendente">Atendente</option></select></div>
+        <div className="flex items-center gap-2">
+          <UserPlus className="size-5 text-primary" />
+          <h2 className="font-display text-lg font-semibold">
+            {editing ? "Editar funcionário" : "Cadastrar funcionário"}
+          </h2>
         </div>
-        <div className="flex flex-wrap gap-2"><Button onClick={() => void salvarFuncionario().catch((error: Error) => toast.error("Não foi possível salvar", { description: error.message }))}>{editing ? <Pencil className="size-4" /> : <UserPlus className="size-4" />}{editing ? "Salvar alterações" : "Cadastrar funcionário"}</Button>{editing && <Button variant="outline" onClick={limpar}>Cancelar</Button>}</div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <Label htmlFor="funcionario-nome">Nome</Label>
+            <Input id="funcionario-nome" value={nome} onChange={(event) => setNome(event.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="funcionario-email">E-mail</Label>
+            <Input id="funcionario-email" type="email" value={email} disabled={Boolean(editing)} onChange={(event) => setEmail(event.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="funcionario-telefone">Telefone</Label>
+            <Input id="funcionario-telefone" value={telefone} onChange={(event) => setTelefone(event.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="funcionario-cargo">Cargo</Label>
+            <Input id="funcionario-cargo" value={cargo} onChange={(event) => setCargo(event.target.value)} />
+          </div>
+          {!editing && (
+            <div>
+              <Label htmlFor="funcionario-senha">Senha inicial</Label>
+              <Input id="funcionario-senha" type="password" value={senha} onChange={(event) => setSenha(event.target.value)} placeholder="Mínimo de 6 caracteres" />
+            </div>
+          )}
+          <div>
+            <Label htmlFor="funcionario-nivel">Nível de acesso</Label>
+            <select id="funcionario-nivel" value={role} onChange={(event) => setRole(event.target.value as (typeof employeeRoles)[number])} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <option value="admin">Administrador</option>
+              <option value="gerente">Gerente</option>
+              <option value="caixa">Caixa</option>
+              <option value="atendente">Atendente</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => void salvarFuncionario().catch((error: Error) => toast.error("Não foi possível salvar", { description: error.message }))}>
+            {editing ? <Pencil className="size-4" /> : <UserPlus className="size-4" />}
+            {editing ? "Salvar alterações" : "Cadastrar funcionário"}
+          </Button>
+          {editing && <Button variant="outline" onClick={limpar}>Cancelar</Button>}
+        </div>
       </div>
+      
       <div className="panel overflow-x-auto p-4">
         <h2 className="font-display text-lg font-semibold">Funcionários cadastrados</h2>
-        {employees.isLoading ? <Skeleton className="mt-4 h-40 rounded-xl" /> : employees.data?.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p> : <table className="mt-4 w-full min-w-[700px] text-left text-sm"><thead className="border-b border-border"><tr><th className="px-3 py-3">Nome</th><th className="px-3 py-3">Contato</th><th className="px-3 py-3">Cargo</th><th className="px-3 py-3">Acesso</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Ações</th></tr></thead><tbody>{employees.data?.map((employee) => <tr key={employee.id} className="border-b border-border last:border-0"><td className="px-3 py-3 font-medium">{employee.nome || "Sem nome"}</td><td className="px-3 py-3">{employee.email || employee.telefone || "—"}</td><td className="px-3 py-3">{employee.cargo || "—"}</td><td className="px-3 py-3">{employee.roles.join(", ") || "Sem acesso"}</td><td className="px-3 py-3">{employee.ativo ? "Ativo" : "Inativo"}</td><td className="flex gap-1 px-3 py-2"><Button variant="ghost" size="icon" onClick={() => editar(employee)} aria-label={`Editar ${employee.nome}`}><Pencil className="size-4" /></Button><Button variant="outline" size="sm" onClick={() => void alternarAtivo(employee)}>{employee.ativo ? "Desativar" : "Ativar"}</Button></td></tr>)}</tbody></table>}
+        {employees.isLoading ? (
+          <Skeleton className="mt-4 h-40 rounded-xl" />
+        ) : employees.data?.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p>
+        ) : (
+          <table className="mt-4 w-full min-w-[700px] text-left text-sm">
+            <thead className="border-b border-border">
+              <tr>
+                <th className="px-3 py-3">Nome</th>
+                <th className="px-3 py-3">Contato</th>
+                <th className="px-3 py-3">Cargo</th>
+                <th className="px-3 py-3">Acesso</th>
+                <th className="px-3 py-3">Status</th>
+                <th className="px-3 py-3">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.data?.map((employee) => (
+                <tr key={employee.id} className="border-b border-border last:border-0">
+                  <td className="px-3 py-3 font-medium">{employee.nome || "Sem nome"}</td>
+                  <td className="px-3 py-3">{employee.email || employee.telefone || "—"}</td>
+                  <td className="px-3 py-3">{employee.cargo || "—"}</td>
+                  <td className="px-3 py-3">{employee.roles.join(", ") || "Sem acesso"}</td>
+                  <td className="px-3 py-3">{employee.ativo ? "Ativo" : "Inativo"}</td>
+                  <td className="flex gap-1 px-3 py-2">
+                    <Button variant="ghost" size="icon" onClick={() => editar(employee)} aria-label={`Editar ${employee.nome}`}>
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => void excluir(employee)} aria-label={`Excluir ${employee.nome}`}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => void alternarAtivo(employee)}>
+                      {employee.ativo ? "Desativar" : "Ativar"}
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
@@ -216,7 +301,6 @@ function CadastroComandas() {
     staleTime: 5 * 60 * 1000,
   });
 
-  /** Etiquetas já cadastradas: são permanentes e nunca mudam de código. */
   const labels = useQuery({
     queryKey: ["comanda-labels"],
     queryFn: async () => {
@@ -263,11 +347,6 @@ function CadastroComandas() {
     },
   });
 
-  /**
-   * Imprime em uma janela isolada: a página do sistema já usa regras de
-   * impressão dedicadas ao cupom de 80 mm, então uma janela própria evita
-   * conflito de estilos e permite folha A4 com várias etiquetas.
-   */
   function imprimir(lista: ComandaLabel[]) {
     if (lista.length === 0) return;
     const janela = window.open("", "_blank", "width=900,height=700");
@@ -388,7 +467,6 @@ function CadastroComandas() {
     </div>
   );
 }
-
 
 function DadosEmpresa() {
   const qc = useQueryClient();
