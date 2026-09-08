@@ -180,6 +180,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Oculta o selo "Edit with Lovable" no site publicado. */
+#lovable-badge,
+[id^="lovable-badge"],
+a[href*="lovable.dev/projects"],
+a[href*="lovable.app?utm"],
+[class*="lovable-badge"],
+[data-lovable-badge] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Impressão de cupom: somente o comprovante vai para a bobina/PDF de 80 mm. */
 @page {
   size: 80mm auto;
