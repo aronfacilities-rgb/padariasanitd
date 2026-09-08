@@ -98,6 +98,105 @@ type ComandaLabel = {
   codigo: string;
 };
 
+type Employee = {
+  id: string;
+  nome: string;
+  email: string | null;
+  telefone: string | null;
+  cargo: string | null;
+  ativo: boolean;
+  roles: string[];
+};
+
+const employeeRoles = ["admin", "gerente", "caixa", "atendente"] as const;
+
+function Funcionarios() {
+  const qc = useQueryClient();
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [cargo, setCargo] = useState("");
+  const [senha, setSenha] = useState("");
+  const [role, setRole] = useState<(typeof employeeRoles)[number]>("atendente");
+  const [editing, setEditing] = useState<Employee | null>(null);
+
+  const employees = useQuery({
+    queryKey: ["funcionarios"],
+    queryFn: async () => {
+      const [{ data: profiles, error: profilesError }, { data: roles, error: rolesError }] = await Promise.all([
+        supabase.from("profiles").select("id, nome, email, telefone, cargo, ativo").order("nome"),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
+      if (profilesError) throw profilesError;
+      if (rolesError) throw rolesError;
+      return (profiles ?? []).map((profile) => ({
+        ...profile,
+        roles: (roles ?? []).filter((item) => item.user_id === profile.id).map((item) => String(item.role)),
+      })) as Employee[];
+    },
+  });
+
+  const limpar = () => {
+    setNome(""); setEmail(""); setTelefone(""); setCargo(""); setSenha(""); setRole("atendente"); setEditing(null);
+  };
+
+  async function salvarFuncionario() {
+    if (editing) {
+      const { error: profileError } = await supabase.from("profiles").update({ nome, telefone: telefone || null, cargo: cargo || null }).eq("id", editing.id);
+      if (profileError) throw profileError;
+      const { error: roleDeleteError } = await supabase.from("user_roles").delete().eq("user_id", editing.id);
+      if (roleDeleteError) throw roleDeleteError;
+      const { error: roleError } = await supabase.from("user_roles").insert({ user_id: editing.id, role: role as never });
+      if (roleError) throw roleError;
+      toast.success("Funcionário atualizado");
+    } else {
+      if (!email.trim() || senha.length < 6 || !nome.trim()) throw new Error("Informe nome, e-mail e uma senha com pelo menos 6 caracteres.");
+      const { data, error: authError } = await supabase.auth.signUp({ email: email.trim(), password: senha });
+      if (authError) throw authError;
+      if (!data.user) throw new Error("Não foi possível criar a conta.");
+      const { error: profileError } = await supabase.from("profiles").upsert({ id: data.user.id, nome, email: email.trim(), telefone: telefone || null, cargo: cargo || null, ativo: true });
+      if (profileError) throw profileError;
+      const { error: roleError } = await supabase.from("user_roles").insert({ user_id: data.user.id, role: role as never });
+      if (roleError) throw roleError;
+      toast.success("Funcionário cadastrado", { description: "A conta foi criada com a senha informada." });
+    }
+    limpar();
+    await qc.invalidateQueries({ queryKey: ["funcionarios"] });
+  }
+
+  async function alternarAtivo(employee: Employee) {
+    const { error } = await supabase.from("profiles").update({ ativo: !employee.ativo }).eq("id", employee.id);
+    if (error) { toast.error("Não foi possível alterar o status", { description: error.message }); return; }
+    toast.success(employee.ativo ? "Funcionário desativado" : "Funcionário ativado");
+    await qc.invalidateQueries({ queryKey: ["funcionarios"] });
+  }
+
+  function editar(employee: Employee) {
+    setEditing(employee); setNome(employee.nome); setEmail(employee.email ?? ""); setTelefone(employee.telefone ?? ""); setCargo(employee.cargo ?? ""); setRole((employee.roles[0] as (typeof employeeRoles)[number]) || "atendente");
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="panel space-y-3 p-4">
+        <div className="flex items-center gap-2"><UserPlus className="size-5 text-primary" /><h2 className="font-display text-lg font-semibold">{editing ? "Editar funcionário" : "Cadastrar funcionário"}</h2></div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div><Label htmlFor="funcionario-nome">Nome</Label><Input id="funcionario-nome" value={nome} onChange={(event) => setNome(event.target.value)} /></div>
+          <div><Label htmlFor="funcionario-email">E-mail</Label><Input id="funcionario-email" type="email" value={email} disabled={Boolean(editing)} onChange={(event) => setEmail(event.target.value)} /></div>
+          <div><Label htmlFor="funcionario-telefone">Telefone</Label><Input id="funcionario-telefone" value={telefone} onChange={(event) => setTelefone(event.target.value)} /></div>
+          <div><Label htmlFor="funcionario-cargo">Cargo</Label><Input id="funcionario-cargo" value={cargo} onChange={(event) => setCargo(event.target.value)} /></div>
+          {!editing && <div><Label htmlFor="funcionario-senha">Senha inicial</Label><Input id="funcionario-senha" type="password" value={senha} onChange={(event) => setSenha(event.target.value)} placeholder="Mínimo de 6 caracteres" /></div>}
+          <div><Label htmlFor="funcionario-nivel">Nível de acesso</Label><select id="funcionario-nivel" value={role} onChange={(event) => setRole(event.target.value as (typeof employeeRoles)[number])} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"><option value="admin">Administrador</option><option value="gerente">Gerente</option><option value="caixa">Caixa</option><option value="atendente">Atendente</option></select></div>
+        </div>
+        <div className="flex flex-wrap gap-2"><Button onClick={() => void salvarFuncionario().catch((error: Error) => toast.error("Não foi possível salvar", { description: error.message }))}>{editing ? <Pencil className="size-4" /> : <UserPlus className="size-4" />}{editing ? "Salvar alterações" : "Cadastrar funcionário"}</Button>{editing && <Button variant="outline" onClick={limpar}>Cancelar</Button>}</div>
+      </div>
+      <div className="panel overflow-x-auto p-4">
+        <h2 className="font-display text-lg font-semibold">Funcionários cadastrados</h2>
+        {employees.isLoading ? <Skeleton className="mt-4 h-40 rounded-xl" /> : employees.data?.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p> : <table className="mt-4 w-full min-w-[700px] text-left text-sm"><thead className="border-b border-border"><tr><th className="px-3 py-3">Nome</th><th className="px-3 py-3">Contato</th><th className="px-3 py-3">Cargo</th><th className="px-3 py-3">Acesso</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Ações</th></tr></thead><tbody>{employees.data?.map((employee) => <tr key={employee.id} className="border-b border-border last:border-0"><td className="px-3 py-3 font-medium">{employee.nome || "Sem nome"}</td><td className="px-3 py-3">{employee.email || employee.telefone || "—"}</td><td className="px-3 py-3">{employee.cargo || "—"}</td><td className="px-3 py-3">{employee.roles.join(", ") || "Sem acesso"}</td><td className="px-3 py-3">{employee.ativo ? "Ativo" : "Inativo"}</td><td className="flex gap-1 px-3 py-2"><Button variant="ghost" size="icon" onClick={() => editar(employee)} aria-label={`Editar ${employee.nome}`}><Pencil className="size-4" /></Button><Button variant="outline" size="sm" onClick={() => void alternarAtivo(employee)}>{employee.ativo ? "Desativar" : "Ativar"}</Button></td></tr>)}</tbody></table>}
+      </div>
+    </div>
+  );
+}
+
 function CadastroComandas() {
   const qc = useQueryClient();
   const [de, setDe] = useState("1");
