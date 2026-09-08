@@ -49,6 +49,7 @@ type Comanda = {
   total: number;
   observacao: string | null;
   created_at: string;
+  aberto_por: string | null;
 };
 
 type Item = {
@@ -68,6 +69,8 @@ type ProdutoBusca = {
   codigo_barras: string | null;
 };
 
+type Perfil = { id: string; nome: string | null };
+
 const STATUS_LABEL: Record<Status, string> = {
   aberta: "Aberta",
   em_consumo: "Em consumo",
@@ -81,12 +84,29 @@ function ComandasPage() {
   const [abrindo, setAbrindo] = useState(false);
   const [selecionada, setSelecionada] = useState<string | null>(null);
 
+  const usuario = useQuery({
+    queryKey: ["usuario-comanda-atual"],
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      if (!data.user) throw new Error("Usuário não autenticado");
+
+      const { data: perfil, error: perfilError } = await supabase
+        .from("profiles")
+        .select("id, nome")
+        .eq("id", data.user.id)
+        .single();
+      if (perfilError) throw perfilError;
+      return perfil as Perfil;
+    },
+  });
+
   const comandas = useQuery({
     queryKey: ["comandas-abertas"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("commands")
-        .select("id, numero, status, total, observacao, created_at")
+        .select("id, numero, status, total, observacao, created_at, aberto_por")
         .in("status", ["aberta", "em_consumo", "aguardando_pagamento"])
         .order("numero");
       if (error) throw error;
@@ -98,12 +118,14 @@ function ComandasPage() {
   const abrir = useMutation({
     mutationFn: async (input: { numero: number; observacao: string | null }) => {
       const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Usuário não autenticado");
+
       const { data, error } = await supabase
         .from("commands")
         .insert({
           numero: input.numero,
           observacao: input.observacao,
-          aberto_por: userData.user?.id ?? null,
+          aberto_por: userData.user.id,
           status: "aberta",
         })
         .select("id")
@@ -171,11 +193,20 @@ function ComandasPage() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>Funcionário responsável</Label>
+                  <div className="rounded-md border bg-muted/30 px-3 py-2.5 text-sm">
+                    {usuario.isLoading ? "Carregando usuário..." : usuario.data?.nome ?? "Usuário logado"}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Definido automaticamente pelo login. Não é necessário selecionar manualmente.
+                  </p>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="observacao">Cliente / mesa (opcional)</Label>
                   <Input id="observacao" name="observacao" placeholder="Ex.: Mesa 3 — Dona Marta" />
                 </div>
                 <DialogFooter>
-                  <Button type="submit" className="h-11" disabled={abrir.isPending}>
+                  <Button type="submit" className="h-11" disabled={abrir.isPending || usuario.isLoading}>
                     {abrir.isPending ? "Abrindo..." : "Abrir comanda"}
                   </Button>
                 </DialogFooter>
@@ -224,6 +255,11 @@ function ComandasPage() {
               <p className="mt-1 truncate text-sm text-muted-foreground">
                 {c.observacao ?? "Sem identificação"}
               </p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {c.aberto_por === usuario.data?.id
+                  ? `Aberta por ${usuario.data.nome ?? "usuário atual"}`
+                  : "Responsável registrado no login"}
+              </p>
               <div className="mt-3 flex items-end justify-between">
                 <span className="text-xs text-muted-foreground">
                   aberta às {timeOnly(c.created_at)}
@@ -250,7 +286,7 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
     queryFn: async () => {
       const { data, error } = await supabase
         .from("commands")
-        .select("id, numero, status, total, observacao, created_at")
+        .select("id, numero, status, total, observacao, created_at, aberto_por")
         .eq("id", id!)
         .single();
       if (error) throw error;
@@ -418,164 +454,127 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
             {comanda.data?.observacao ?? "Sem identificação"}
           </p>
         </SheetHeader>
-
-        <div className="border-b border-border p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar produto para lançar"
-              className="h-12 pl-9"
-            />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {sugestoes.map((p) => (
-              <Button
-                key={p.id}
-                variant="outline"
-                size="sm"
-                className="h-10"
-                onClick={() => adicionar.mutate(p)}
-              >
-                {p.nome}
-                <span className="numeric text-muted-foreground">{brl(p.preco_venda)}</span>
-              </Button>
-            ))}
-            {produtos.isLoading ? <Skeleton className="h-10 w-40" /> : null}
-          </div>
-        </div>
-
         <div className="flex-1 overflow-y-auto p-4">
-          {itens.isLoading ? (
-            <Skeleton className="h-24 rounded-xl" />
-          ) : (itens.data ?? []).length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Nenhum item lançado ainda.
-            </p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {(itens.data ?? []).map((i) => (
-                <li key={i.id} className="flex items-center gap-3 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{i.nome}</p>
-                    <p className="numeric text-xs text-muted-foreground">
-                      {num(i.quantidade, 2)} × {brl(i.preco_unitario)}
-                    </p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="buscar-produto">Adicionar produto</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
+                <Input
+                  id="buscar-produto"
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  placeholder="Nome, código ou código de barras"
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              {sugestoes.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => adicionar.mutate(p)}
+                  disabled={adicionar.isPending}
+                  className="rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium">{p.nome}</span>
+                    <span className="numeric font-semibold">{brl(p.preco_venda)}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      aria-label="Diminuir"
-                      onClick={() => alterarQtd.mutate({ item: i, delta: -1 })}
-                    >
-                      <Minus className="size-4" />
-                    </Button>
-                    <QtdInput
-                      key={`${i.id}-${i.quantidade}`}
-                      item={i}
-                      onSubmit={(valor) => definirQtd.mutate({ item: i, valor })}
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      aria-label="Aumentar"
-                      onClick={() => alterarQtd.mutate({ item: i, delta: 1 })}
-                    >
-                      <Plus className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Remover item"
-                      onClick={() => remover.mutate(i.id)}
-                    >
-                      <Trash2 className="size-4 text-destructive" />
-                    </Button>
-                  </div>
-                  <span className="numeric w-20 text-right font-semibold">
-                    {brl(Number(i.quantidade) * Number(i.preco_unitario))}
+                  <span className="text-xs text-muted-foreground">
+                    {p.codigo_barras ?? p.codigo_interno ?? p.unidade}
                   </span>
-                </li>
+                </button>
               ))}
-            </ul>
-          )}
+            </div>
 
-          <div className="mt-6 space-y-2">
-            <Label htmlFor="obs-comanda">Observações</Label>
-            <Textarea
-              id="obs-comanda"
-              defaultValue={comanda.data?.observacao ?? ""}
-              onBlur={(e) => {
-                if (e.target.value !== (comanda.data?.observacao ?? "")) {
-                  salvarObs.mutate(e.target.value);
-                }
-              }}
-              placeholder="Cliente, mesa, pedido especial..."
-            />
+            <div className="space-y-2">
+              {(itens.data ?? []).map((item) => (
+                <div key={item.id} className="rounded-lg border p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{item.nome}</p>
+                      <p className="numeric text-sm text-muted-foreground">
+                        {brl(item.preco_unitario)} cada
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => alterarQtd.mutate({ item, delta: -1 })}
+                        aria-label={`Diminuir ${item.nome}`}
+                      >
+                        <Minus className="size-4" />
+                      </Button>
+                      <Input
+                        value={String(item.quantidade)}
+                        onChange={(e) => {
+                          const valor = Number(e.target.value);
+                          if (e.target.value !== "" && Number.isFinite(valor)) {
+                            definirQtd.mutate({ item, valor });
+                          }
+                        }}
+                        className="numeric h-9 w-16 text-center"
+                        inputMode="decimal"
+                        aria-label={`Quantidade de ${item.nome}`}
+                      />
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => alterarQtd.mutate({ item, delta: 1 })}
+                        aria-label={`Aumentar ${item.nome}`}
+                      >
+                        <Plus className="size-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => remover.mutate(item.id)}
+                        aria-label={`Remover ${item.nome}`}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="observacao-comanda">Observação</Label>
+              <Textarea
+                id="observacao-comanda"
+                defaultValue={comanda.data?.observacao ?? ""}
+                onBlur={(e) => salvarObs.mutate(e.target.value)}
+                placeholder="Cliente, mesa ou observação do pedido"
+              />
+            </div>
           </div>
         </div>
-
-        <div className="space-y-3 border-t border-border p-4">
-          <div className="flex items-center justify-between">
+        <div className="border-t border-border p-4">
+          <div className="mb-3 flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Total</span>
-            <span className="numeric font-display text-2xl font-semibold">
-              {brl(comanda.data?.total ?? 0)}
-            </span>
+            <span className="numeric text-2xl font-semibold">{brl(comanda.data?.total ?? 0)}</span>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Button
-              className="h-12"
-              disabled={(itens.data ?? []).length === 0 || mudarStatus.isPending}
-              onClick={() => mudarStatus.mutate("aguardando_pagamento")}
-            >
-              Enviar para o caixa
-            </Button>
+          <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
-              className="h-12"
-              disabled={mudarStatus.isPending}
               onClick={() => mudarStatus.mutate("cancelada")}
+              disabled={mudarStatus.isPending}
             >
-              Cancelar comanda
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => mudarStatus.mutate("aguardando_pagamento")}
+              disabled={mudarStatus.isPending}
+            >
+              Enviar ao caixa
             </Button>
           </div>
         </div>
       </SheetContent>
     </Sheet>
-  );
-}
-
-function QtdInput({ item, onSubmit }: { item: Item; onSubmit: (valor: number) => void }) {
-  const [texto, setTexto] = useState<string>(String(Number(item.quantidade)));
-  const atual = String(Number(item.quantidade));
-
-  function confirmar() {
-    const valor = Number(texto.replace(",", "."));
-    if (!Number.isFinite(valor)) {
-      setTexto(atual);
-      return;
-    }
-    if (valor === Number(item.quantidade)) return;
-    onSubmit(valor);
-  }
-
-  return (
-    <Input
-      value={texto}
-      aria-label={`Quantidade de ${item.nome}`}
-      inputMode="decimal"
-      className="numeric h-9 w-16 text-center"
-      onChange={(e) => setTexto(e.target.value)}
-      onFocus={(e) => e.currentTarget.select()}
-      onBlur={confirmar}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          e.currentTarget.blur();
-        }
-      }}
-    />
   );
 }
