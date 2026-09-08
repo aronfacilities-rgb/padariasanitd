@@ -16,29 +16,14 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_painel/produtos")({
   head: () => ({
     meta: [
       { title: "Produtos — Padaria Santiago" },
-      {
-        name: "description",
-        content: "Cadastro de produtos da Padaria Santiago: preço, custo, estoque e códigos.",
-      },
+      { name: "description", content: "Cadastro de produtos da Padaria Santiago: preço, custo, estoque e códigos." },
       { property: "og:title", content: "Produtos — Padaria Santiago" },
       { property: "og:description", content: "Cadastro e consulta de produtos da padaria." },
     ],
@@ -83,10 +68,7 @@ type ProdutoInput = {
   aliquota: number | null;
 };
 
-type BarcodeDetectorLike = {
-  detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue?: string }>>;
-};
-
+type BarcodeDetectorLike = { detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue?: string }>> };
 type BarcodeDetectorConstructorLike = new (options?: { formats?: string[] }) => BarcodeDetectorLike;
 
 function getBarcodeDetector(): BarcodeDetectorConstructorLike | null {
@@ -94,15 +76,7 @@ function getBarcodeDetector(): BarcodeDetectorConstructorLike | null {
   return value ?? null;
 }
 
-function ScannerDialog({
-  open,
-  onOpenChange,
-  onDetected,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onDetected: (code: string) => void;
-}) {
+function ScannerDialog({ open, onOpenChange, onDetected }: { open: boolean; onOpenChange: (open: boolean) => void; onDetected: (code: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [manual, setManual] = useState("");
@@ -127,9 +101,7 @@ function ScannerDialog({
 
     let ativo = true;
     let timer: number | undefined;
-
-    void navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false })
+    void navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false })
       .then((stream) => {
         if (!ativo) {
           stream.getTracks().forEach((track) => track.stop());
@@ -159,7 +131,7 @@ function ScannerDialog({
               return;
             }
           } catch {
-            // A câmera pode falhar durante a leitura; o campo manual continua disponível.
+            // O campo manual continua disponível se a câmera não conseguir detectar o código.
           }
           timer = window.setTimeout(() => void detectar(), 350);
         };
@@ -186,19 +158,12 @@ function ScannerDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="font-display">Ler código de barras</DialogTitle>
-        </DialogHeader>
+        <DialogHeader><DialogTitle className="font-display">Ler código de barras</DialogTitle></DialogHeader>
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border bg-muted">
-            <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline />
-          </div>
+          <div className="overflow-hidden rounded-xl border bg-muted"><video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline /></div>
           {cameraAtiva ? <p className="text-center text-sm text-muted-foreground">Aponte a câmera para o código de barras.</p> : null}
           {cameraErro ? <p className="text-sm text-muted-foreground">{cameraErro}</p> : null}
-          <form onSubmit={enviarManual} className="flex gap-2">
-            <Input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Digite ou use um leitor USB" autoFocus />
-            <Button type="submit">Usar código</Button>
-          </form>
+          <form onSubmit={enviarManual} className="flex gap-2"><Input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Digite ou use um leitor USB" autoFocus /><Button type="submit">Usar código</Button></form>
         </div>
       </DialogContent>
     </Dialog>
@@ -218,10 +183,7 @@ function ProdutosPage() {
   const produtos = useQuery({
     queryKey: ["produtos"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("id, nome, codigo_interno, codigo_barras, category_id, unidade, preco_venda, custo, estoque_atual, estoque_minimo, ncm, cfop, cst, aliquota, ativo")
-        .order("nome");
+      const { data, error } = await supabase.from("products").select("id, nome, codigo_interno, codigo_barras, category_id, unidade, preco_venda, custo, estoque_atual, estoque_minimo, ncm, cfop, cst, aliquota, ativo").order("nome");
       if (error) throw error;
       return (data ?? []) as Produto[];
     },
@@ -238,8 +200,12 @@ function ProdutosPage() {
 
   const salvar = useMutation({
     mutationFn: async ({ id, dados }: { id: string | null; dados: ProdutoInput }) => {
-      const request = id ? supabase.from("products").update(dados).eq("id", id) : supabase.from("products").insert(dados);
-      const { error } = await request;
+      if (id) {
+        const { error } = await supabase.from("products").update(dados).eq("id", id);
+        if (error) throw error;
+        return;
+      }
+      const { error } = await supabase.from("products").insert(dados);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -309,10 +275,7 @@ function ProdutosPage() {
   }, [produtos.data, scannerDestino]);
 
   function imprimir(p: Produto) {
-    const resultado = imprimirEtiquetasProduto(
-      [{ nome: p.nome, codigo: p.codigo_interno, codigoBarras: p.codigo_barras, preco: p.preco_venda }],
-      "Padaria Santiago",
-    );
+    const resultado = imprimirEtiquetasProduto([{ nome: p.nome, codigo: p.codigo_interno, codigoBarras: p.codigo_barras, preco: p.preco_venda }], "Padaria Santiago");
     if (!resultado.ok) toast.error("Não foi possível preparar a etiqueta");
   }
 
@@ -350,17 +313,10 @@ function ProdutosPage() {
 
   return (
     <>
-      <PageHeader
-        title="Produtos"
-        description="Cadastro, preços, estoque e códigos dos produtos."
-        actions={isManager ? <Button className="h-11" onClick={() => { setEditando(null); setAberto(true); }}><Plus className="size-4" /> Novo produto</Button> : null}
-      />
+      <PageHeader title="Produtos" description="Cadastro, preços, estoque e códigos dos produtos." actions={isManager ? <Button className="h-11" onClick={() => { setEditando(null); setAberto(true); }}><Plus className="size-4" /> Novo produto</Button> : null} />
 
       <div className="panel mb-4 flex flex-wrap items-center gap-3 p-4">
-        <div className="relative min-w-56 flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, código ou código de barras" className="h-11 pl-9" />
-        </div>
+        <div className="relative min-w-56 flex-1"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, código ou código de barras" className="h-11 pl-9" /></div>
         <Button variant="outline" className="h-11" onClick={() => abrirScanner("busca")}><Barcode className="size-4" /> Ler código</Button>
         <label className="flex items-center gap-2 px-1 text-sm"><Switch checked={soAtivos} onCheckedChange={setSoAtivos} /> Somente ativos</label>
       </div>
@@ -380,14 +336,12 @@ function ProdutosPage() {
                 <div className="w-28 text-right"><p className={`numeric font-medium ${baixo ? "text-destructive" : ""}`}>{num(p.estoque_atual, 2)}</p><p className="text-xs text-muted-foreground">mín. {num(p.estoque_minimo, 2)}</p></div>
                 {!p.ativo ? <Badge variant="secondary">Inativo</Badge> : null}
                 {baixo ? <Badge variant="destructive">Estoque baixo</Badge> : null}
-                {isManager ? (
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon" aria-label={`Editar ${p.nome}`} onClick={() => { setEditando(p); setAberto(true); }}><Pencil className="size-4" /></Button>
-                    <Button variant="outline" size="icon" aria-label={`Imprimir etiqueta de ${p.nome}`} onClick={() => imprimir(p)}><Printer className="size-4" /></Button>
-                    <Button variant="outline" size="sm" onClick={() => alternarStatus.mutate(p)} disabled={alternarStatus.isPending}>{p.ativo ? "Inativar" : "Ativar"}</Button>
-                    <Button variant="outline" size="icon" aria-label={`Excluir ${p.nome}`} onClick={() => { if (window.confirm(`Excluir o produto “${p.nome}”? Esta ação não poderá ser desfeita.`)) excluir.mutate(p); }} disabled={excluir.isPending}><Trash2 className="size-4" /></Button>
-                  </div>
-                ) : null}
+                {isManager ? <div className="flex gap-2">
+                  <Button variant="outline" size="icon" aria-label={`Editar ${p.nome}`} onClick={() => { setEditando(p); setAberto(true); }}><Pencil className="size-4" /></Button>
+                  <Button variant="outline" size="icon" aria-label={`Imprimir etiqueta de ${p.nome}`} onClick={() => imprimir(p)}><Printer className="size-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => alternarStatus.mutate(p)} disabled={alternarStatus.isPending}>{p.ativo ? "Inativar" : "Ativar"}</Button>
+                  <Button variant="outline" size="icon" aria-label={`Excluir ${p.nome}`} onClick={() => { if (window.confirm(`Excluir o produto “${p.nome}”? Esta ação não poderá ser desfeita.`)) excluir.mutate(p); }} disabled={excluir.isPending}><Trash2 className="size-4" /></Button>
+                </div> : null}
               </div>
             );
           })}
