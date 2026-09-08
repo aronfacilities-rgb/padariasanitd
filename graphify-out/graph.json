@@ -7642,7 +7642,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/caixa-page.tsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -7654,7 +7654,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/caixa-page.tsx",
-      "source_location": "L37",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -26330,5 +26330,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "afd32307beab30a6ac210bf9d3b52ea6b2756245"
+  "built_at_commit": "42122117c08a245e8989681ffc18ac12d199767d"
 }
