@@ -1,6 +1,10 @@
 {
   "communities": {
     "0": [
+      "ref_lucide_react",
+      "ref_radix_ui_react_select",
+      "ref_sonner",
+      "ref_tanstack_react_query",
       "src_components_cupom",
       "src_components_cupom_cupom",
       "src_components_cupom_cupomdata",
@@ -16,14 +20,12 @@
       "src_components_ui_badge_badge",
       "src_components_ui_badge_badgeprops",
       "src_components_ui_badge_badgevariants",
-      "src_components_ui_button",
-      "src_components_ui_button_button",
-      "src_components_ui_checkbox",
-      "src_components_ui_checkbox_checkbox",
       "src_components_ui_dialog",
       "src_components_ui_dialog_dialogcontent",
+      "src_components_ui_dialog_dialogdescription",
       "src_components_ui_dialog_dialogfooter",
       "src_components_ui_dialog_dialogheader",
+      "src_components_ui_dialog_dialogoverlay",
       "src_components_ui_dialog_dialogtitle",
       "src_components_ui_input",
       "src_components_ui_input_input",
@@ -33,11 +35,13 @@
       "src_components_ui_select",
       "src_components_ui_select_selectcontent",
       "src_components_ui_select_selectitem",
+      "src_components_ui_select_selectlabel",
+      "src_components_ui_select_selectscrolldownbutton",
+      "src_components_ui_select_selectscrollupbutton",
+      "src_components_ui_select_selectseparator",
       "src_components_ui_select_selecttrigger",
       "src_components_ui_skeleton",
       "src_components_ui_skeleton_skeleton",
-      "src_components_ui_switch",
-      "src_components_ui_switch_switch",
       "src_components_ui_tabs",
       "src_components_ui_tabs_tabscontent",
       "src_components_ui_tabs_tabslist",
@@ -55,8 +59,6 @@
       "src_lib_format_startofmonth",
       "src_lib_format_startoftoday",
       "src_lib_format_timeonly",
-      "src_lib_utils",
-      "src_routes_auth",
       "src_routes_painel_caixa",
       "src_routes_painel_caixa_caixa",
       "src_routes_painel_caixa_caixapage",
@@ -87,7 +89,6 @@
       "src_routes_painel_dashboard_periodo",
       "src_routes_painel_dashboard_periodos",
       "src_routes_painel_dashboard_rangefor",
-      "src_routes_painel_dashboard_route",
       "src_routes_painel_dashboard_salerow",
       "src_routes_painel_estoque",
       "src_routes_painel_estoque_estoquepage",
@@ -108,58 +109,187 @@
       "src_routes_painel_produtos_unidades"
     ],
     "1": [
-      "src_components_ui_card",
-      "src_components_ui_card_card",
-      "src_components_ui_card_cardcontent",
-      "src_components_ui_card_carddescription",
-      "src_components_ui_card_cardfooter",
-      "src_components_ui_card_cardheader",
-      "src_components_ui_card_cardtitle",
-      "src_components_ui_command",
-      "src_components_ui_command_command",
-      "src_components_ui_command_commanddialog",
-      "src_components_ui_command_commandempty",
-      "src_components_ui_command_commandgroup",
-      "src_components_ui_command_commandinput",
-      "src_components_ui_command_commanditem",
-      "src_components_ui_command_commandlist",
-      "src_components_ui_command_commandseparator",
-      "src_components_ui_command_commandshortcut",
-      "src_components_ui_dialog_dialogdescription",
-      "src_components_ui_dialog_dialogoverlay",
-      "src_components_ui_hover_card",
-      "src_components_ui_hover_card_hovercardcontent",
-      "src_components_ui_popover",
-      "src_components_ui_popover_popovercontent",
-      "src_components_ui_progress",
-      "src_components_ui_progress_progress",
-      "src_components_ui_radio_group",
-      "src_components_ui_radio_group_radiogroup",
-      "src_components_ui_radio_group_radiogroupitem",
-      "src_components_ui_resizable",
-      "src_components_ui_resizable_resizablehandle",
-      "src_components_ui_resizable_resizablepanelgroup",
-      "src_components_ui_scroll_area",
-      "src_components_ui_scroll_area_scrollarea",
-      "src_components_ui_scroll_area_scrollbar",
-      "src_components_ui_select_selectlabel",
-      "src_components_ui_select_selectscrolldownbutton",
-      "src_components_ui_select_selectscrollupbutton",
-      "src_components_ui_select_selectseparator",
-      "src_components_ui_slider",
-      "src_components_ui_slider_slider",
-      "src_components_ui_table",
-      "src_components_ui_table_table",
-      "src_components_ui_table_tablebody",
-      "src_components_ui_table_tablecaption",
-      "src_components_ui_table_tablecell",
-      "src_components_ui_table_tablefooter",
-      "src_components_ui_table_tablehead",
-      "src_components_ui_table_tableheader",
-      "src_components_ui_table_tablerow",
-      "src_lib_utils_cn"
+      "package_dependencies",
+      "package_dependencies_class_variance_authority",
+      "package_dependencies_clsx",
+      "package_dependencies_cmdk",
+      "package_dependencies_date_fns",
+      "package_dependencies_embla_carousel_react",
+      "package_dependencies_hookform_resolvers",
+      "package_dependencies_input_otp",
+      "package_dependencies_jsbarcode",
+      "package_dependencies_lucide_react",
+      "package_dependencies_radix_ui_react_accordion",
+      "package_dependencies_radix_ui_react_alert_dialog",
+      "package_dependencies_radix_ui_react_aspect_ratio",
+      "package_dependencies_radix_ui_react_avatar",
+      "package_dependencies_radix_ui_react_checkbox",
+      "package_dependencies_radix_ui_react_collapsible",
+      "package_dependencies_radix_ui_react_context_menu",
+      "package_dependencies_radix_ui_react_dialog",
+      "package_dependencies_radix_ui_react_dropdown_menu",
+      "package_dependencies_radix_ui_react_hover_card",
+      "package_dependencies_radix_ui_react_label",
+      "package_dependencies_radix_ui_react_menubar",
+      "package_dependencies_radix_ui_react_navigation_menu",
+      "package_dependencies_radix_ui_react_popover",
+      "package_dependencies_radix_ui_react_progress",
+      "package_dependencies_radix_ui_react_radio_group",
+      "package_dependencies_radix_ui_react_scroll_area",
+      "package_dependencies_radix_ui_react_select",
+      "package_dependencies_radix_ui_react_separator",
+      "package_dependencies_radix_ui_react_slider",
+      "package_dependencies_radix_ui_react_slot",
+      "package_dependencies_radix_ui_react_switch",
+      "package_dependencies_radix_ui_react_tabs",
+      "package_dependencies_radix_ui_react_toggle",
+      "package_dependencies_radix_ui_react_toggle_group",
+      "package_dependencies_radix_ui_react_tooltip",
+      "package_dependencies_react",
+      "package_dependencies_react_day_picker",
+      "package_dependencies_react_dom",
+      "package_dependencies_react_hook_form",
+      "package_dependencies_react_resizable_panels",
+      "package_dependencies_recharts",
+      "package_dependencies_sonner",
+      "package_dependencies_supabase_supabase_js",
+      "package_dependencies_tailwind_merge",
+      "package_dependencies_tailwindcss",
+      "package_dependencies_tailwindcss_vite",
+      "package_dependencies_tanstack_react_query",
+      "package_dependencies_tanstack_react_router",
+      "package_dependencies_tanstack_react_start",
+      "package_dependencies_tanstack_router_plugin",
+      "package_dependencies_tw_animate_css",
+      "package_dependencies_vaul",
+      "package_dependencies_vite_tsconfig_paths",
+      "package_dependencies_zod"
     ],
     "2": [
+      "ref_embla_carousel_react",
+      "ref_radix_ui_react_alert_dialog",
+      "ref_react_day_picker",
+      "src_components_ui_alert_dialog",
+      "src_components_ui_alert_dialog_alertdialogaction",
+      "src_components_ui_alert_dialog_alertdialogcancel",
+      "src_components_ui_alert_dialog_alertdialogcontent",
+      "src_components_ui_alert_dialog_alertdialogdescription",
+      "src_components_ui_alert_dialog_alertdialogfooter",
+      "src_components_ui_alert_dialog_alertdialogheader",
+      "src_components_ui_alert_dialog_alertdialogoverlay",
+      "src_components_ui_alert_dialog_alertdialogtitle",
+      "src_components_ui_button",
+      "src_components_ui_button_button",
+      "src_components_ui_button_buttonprops",
+      "src_components_ui_button_buttonvariants",
+      "src_components_ui_calendar",
+      "src_components_ui_calendar_calendar",
+      "src_components_ui_calendar_calendardaybutton",
+      "src_components_ui_carousel",
+      "src_components_ui_carousel_carousel",
+      "src_components_ui_carousel_carouselapi",
+      "src_components_ui_carousel_carouselcontent",
+      "src_components_ui_carousel_carouselcontext",
+      "src_components_ui_carousel_carouselcontextprops",
+      "src_components_ui_carousel_carouselitem",
+      "src_components_ui_carousel_carouselnext",
+      "src_components_ui_carousel_carouseloptions",
+      "src_components_ui_carousel_carouselplugin",
+      "src_components_ui_carousel_carouselprevious",
+      "src_components_ui_carousel_carouselprops",
+      "src_components_ui_carousel_usecarousel",
+      "src_components_ui_carousel_usecarouselparameters",
+      "src_components_ui_pagination",
+      "src_components_ui_pagination_pagination",
+      "src_components_ui_pagination_paginationcontent",
+      "src_components_ui_pagination_paginationellipsis",
+      "src_components_ui_pagination_paginationitem",
+      "src_components_ui_pagination_paginationlink",
+      "src_components_ui_pagination_paginationlinkprops",
+      "src_components_ui_pagination_paginationnext",
+      "src_components_ui_pagination_paginationprevious"
+    ],
+    "3": [
+      "ref_radix_ui_react_checkbox",
+      "ref_react",
+      "ref_tanstack_react_router",
+      "src_components_logo",
+      "src_components_logo_logo",
+      "src_components_ui_checkbox",
+      "src_components_ui_checkbox_checkbox",
+      "src_components_ui_sonner",
+      "src_components_ui_sonner_toaster",
+      "src_components_ui_sonner_toasterprops",
+      "src_lib_auth",
+      "src_lib_auth_approle",
+      "src_lib_auth_authcontext",
+      "src_lib_auth_authprovider",
+      "src_lib_auth_authprovider_load",
+      "src_lib_auth_authstate",
+      "src_lib_auth_profile",
+      "src_lib_auth_role_label",
+      "src_lib_auth_useauth",
+      "src_lib_lovable_error_reporting",
+      "src_lib_lovable_error_reporting_lovableerroroptions",
+      "src_lib_lovable_error_reporting_lovableevents",
+      "src_lib_lovable_error_reporting_reportlovableerror",
+      "src_lib_lovable_error_reporting_window",
+      "src_routes_auth",
+      "src_routes_auth_authpage",
+      "src_routes_auth_authpage_entrar",
+      "src_routes_index",
+      "src_routes_index_home",
+      "src_routes_painel",
+      "src_routes_painel_mobile_keys",
+      "src_routes_painel_nav",
+      "src_routes_painel_navitem",
+      "src_routes_painel_painellayout",
+      "src_routes_root",
+      "src_routes_root_errorcomponent",
+      "src_routes_root_notfoundcomponent",
+      "src_routes_root_rootcomponent",
+      "src_routes_root_rootshell"
+    ],
+    "4": [
+      "src_router",
+      "src_router_getrouter",
+      "src_routes_auth_route",
+      "src_routes_index_route",
+      "src_routes_painel_caixa_route",
+      "src_routes_painel_comandas_route",
+      "src_routes_painel_configuracoes_route",
+      "src_routes_painel_dashboard_route",
+      "src_routes_painel_estoque_route",
+      "src_routes_painel_pdv_route",
+      "src_routes_painel_produtos_route",
+      "src_routes_painel_route",
+      "src_routes_root_route",
+      "src_routetree_gen",
+      "src_routetree_gen_authroute",
+      "src_routetree_gen_fileroutesbyfullpath",
+      "src_routetree_gen_fileroutesbyid",
+      "src_routetree_gen_fileroutesbypath",
+      "src_routetree_gen_fileroutesbyto",
+      "src_routetree_gen_fileroutetypes",
+      "src_routetree_gen_indexroute",
+      "src_routetree_gen_painelcaixaroute",
+      "src_routetree_gen_painelcomandasroute",
+      "src_routetree_gen_painelconfiguracoesroute",
+      "src_routetree_gen_paineldashboardroute",
+      "src_routetree_gen_painelestoqueroute",
+      "src_routetree_gen_painelpdvroute",
+      "src_routetree_gen_painelprodutosroute",
+      "src_routetree_gen_painelroute",
+      "src_routetree_gen_painelroutechildren",
+      "src_routetree_gen_painelroutewithchildren",
+      "src_routetree_gen_register",
+      "src_routetree_gen_rootroutechildren",
+      "src_routetree_gen_routetree",
+      "src_routetree_gen_tanstack_react_router",
+      "src_routetree_gen_tanstack_react_start",
+      "src_start_startinstance"
+    ],
+    "5": [
       "src_components_ui_separator",
       "src_components_ui_separator_separator",
       "src_components_ui_sidebar",
@@ -195,72 +325,74 @@
       "src_hooks_use_mobile",
       "src_hooks_use_mobile_useismobile"
     ],
-    "3": [
-      "ref_dom",
-      "ref_dom_iterable",
-      "ref_es2022",
-      "ref_eslint_config_js",
-      "ref_src_ts",
-      "ref_src_tsx",
-      "ref_vite_client",
-      "ref_vite_config_ts",
-      "tsconfig",
-      "tsconfig_compileroptions",
-      "tsconfig_compileroptions_allowimportingtsextensions",
-      "tsconfig_compileroptions_exactoptionalpropertytypes",
-      "tsconfig_compileroptions_jsx",
-      "tsconfig_compileroptions_lib",
-      "tsconfig_compileroptions_module",
-      "tsconfig_compileroptions_moduleresolution",
-      "tsconfig_compileroptions_noemit",
-      "tsconfig_compileroptions_nofallthroughcasesinswitch",
-      "tsconfig_compileroptions_noimplicitoverride",
-      "tsconfig_compileroptions_noimplicitreturns",
-      "tsconfig_compileroptions_nopropertyaccessfromindexsignature",
-      "tsconfig_compileroptions_nouncheckedindexedaccess",
-      "tsconfig_compileroptions_nouncheckedsideeffectimports",
-      "tsconfig_compileroptions_nounusedlocals",
-      "tsconfig_compileroptions_nounusedparameters",
-      "tsconfig_compileroptions_paths",
-      "tsconfig_compileroptions_skiplibcheck",
-      "tsconfig_compileroptions_strict",
-      "tsconfig_compileroptions_target",
-      "tsconfig_compileroptions_types",
-      "tsconfig_compileroptions_verbatimmodulesyntax",
-      "tsconfig_include"
+    "6": [
+      "ref_radix_ui_react_context_menu",
+      "ref_radix_ui_react_dropdown_menu",
+      "src_components_ui_context_menu",
+      "src_components_ui_context_menu_contextmenucheckboxitem",
+      "src_components_ui_context_menu_contextmenucontent",
+      "src_components_ui_context_menu_contextmenuitem",
+      "src_components_ui_context_menu_contextmenulabel",
+      "src_components_ui_context_menu_contextmenuradioitem",
+      "src_components_ui_context_menu_contextmenuseparator",
+      "src_components_ui_context_menu_contextmenushortcut",
+      "src_components_ui_context_menu_contextmenusubcontent",
+      "src_components_ui_context_menu_contextmenusubtrigger",
+      "src_components_ui_dropdown_menu",
+      "src_components_ui_dropdown_menu_dropdownmenucheckboxitem",
+      "src_components_ui_dropdown_menu_dropdownmenucontent",
+      "src_components_ui_dropdown_menu_dropdownmenuitem",
+      "src_components_ui_dropdown_menu_dropdownmenulabel",
+      "src_components_ui_dropdown_menu_dropdownmenuradioitem",
+      "src_components_ui_dropdown_menu_dropdownmenuseparator",
+      "src_components_ui_dropdown_menu_dropdownmenushortcut",
+      "src_components_ui_dropdown_menu_dropdownmenusubcontent",
+      "src_components_ui_dropdown_menu_dropdownmenusubtrigger",
+      "src_components_ui_table",
+      "src_components_ui_table_table",
+      "src_components_ui_table_tablebody",
+      "src_components_ui_table_tablecaption",
+      "src_components_ui_table_tablecell",
+      "src_components_ui_table_tablefooter",
+      "src_components_ui_table_tablehead",
+      "src_components_ui_table_tableheader",
+      "src_components_ui_table_tablerow",
+      "src_lib_utils_cn"
     ],
-    "4": [
-      "src_routes_auth_route",
-      "src_routes_painel_caixa_route",
-      "src_routes_painel_comandas_route",
-      "src_routes_painel_configuracoes_route",
-      "src_routes_painel_estoque_route",
-      "src_routes_painel_pdv_route",
-      "src_routes_painel_produtos_route",
-      "src_routes_root_route",
-      "src_routetree_gen",
-      "src_routetree_gen_authroute",
-      "src_routetree_gen_fileroutesbyfullpath",
-      "src_routetree_gen_fileroutesbyid",
-      "src_routetree_gen_fileroutesbypath",
-      "src_routetree_gen_fileroutesbyto",
-      "src_routetree_gen_fileroutetypes",
-      "src_routetree_gen_indexroute",
-      "src_routetree_gen_painelcaixaroute",
-      "src_routetree_gen_painelcomandasroute",
-      "src_routetree_gen_painelconfiguracoesroute",
-      "src_routetree_gen_paineldashboardroute",
-      "src_routetree_gen_painelestoqueroute",
-      "src_routetree_gen_painelpdvroute",
-      "src_routetree_gen_painelprodutosroute",
-      "src_routetree_gen_painelroute",
-      "src_routetree_gen_painelroutechildren",
-      "src_routetree_gen_painelroutewithchildren",
-      "src_routetree_gen_rootroutechildren",
-      "src_routetree_gen_tanstack_react_router",
-      "src_routetree_gen_tanstack_react_start"
+    "7": [
+      "package",
+      "package_name",
+      "package_private",
+      "package_sideeffects",
+      "package_type",
+      "ref_date_fns",
+      "ref_eslint",
+      "ref_eslint_config_prettier",
+      "ref_eslint_plugin_prettier",
+      "ref_hookform_resolvers",
+      "ref_jsbarcode",
+      "ref_nitro",
+      "ref_prettier",
+      "ref_radix_ui_react_separator",
+      "ref_radix_ui_react_tabs",
+      "ref_radix_ui_react_tooltip",
+      "ref_react_dom",
+      "ref_tailwindcss",
+      "ref_tailwindcss_vite",
+      "ref_tanstack_router_plugin",
+      "ref_tw_animate_css",
+      "ref_types_jsbarcode",
+      "ref_types_node",
+      "ref_types_react",
+      "ref_types_react_dom",
+      "ref_typescript",
+      "ref_vite",
+      "ref_vite_tsconfig_paths",
+      "ref_vitejs_plugin_react",
+      "ref_zod"
     ],
-    "5": [
+    "8": [
+      "ref_supabase_supabase_js",
       "src_integrations_supabase_auth_middleware",
       "src_integrations_supabase_auth_middleware_createsupabasefetch",
       "src_integrations_supabase_auth_middleware_isnewsupabaseapikey",
@@ -290,32 +422,60 @@
       "src_lib_audit",
       "src_lib_audit_logaudit"
     ],
-    "6": [
-      "src_components_ui_alert_dialog",
-      "src_components_ui_alert_dialog_alertdialogaction",
-      "src_components_ui_alert_dialog_alertdialogcancel",
-      "src_components_ui_alert_dialog_alertdialogcontent",
-      "src_components_ui_alert_dialog_alertdialogdescription",
-      "src_components_ui_alert_dialog_alertdialogfooter",
-      "src_components_ui_alert_dialog_alertdialogheader",
-      "src_components_ui_alert_dialog_alertdialogoverlay",
-      "src_components_ui_alert_dialog_alertdialogtitle",
-      "src_components_ui_button_buttonprops",
-      "src_components_ui_button_buttonvariants",
-      "src_components_ui_calendar",
-      "src_components_ui_calendar_calendar",
-      "src_components_ui_calendar_calendardaybutton",
-      "src_components_ui_pagination",
-      "src_components_ui_pagination_pagination",
-      "src_components_ui_pagination_paginationcontent",
-      "src_components_ui_pagination_paginationellipsis",
-      "src_components_ui_pagination_paginationitem",
-      "src_components_ui_pagination_paginationlink",
-      "src_components_ui_pagination_paginationlinkprops",
-      "src_components_ui_pagination_paginationnext",
-      "src_components_ui_pagination_paginationprevious"
+    "9": [
+      "ref_class_variance_authority",
+      "ref_radix_ui_react_navigation_menu",
+      "ref_radix_ui_react_toggle",
+      "ref_radix_ui_react_toggle_group",
+      "src_components_ui_alert",
+      "src_components_ui_alert_alert",
+      "src_components_ui_alert_alertdescription",
+      "src_components_ui_alert_alerttitle",
+      "src_components_ui_alert_alertvariants",
+      "src_components_ui_navigation_menu",
+      "src_components_ui_navigation_menu_navigationmenu",
+      "src_components_ui_navigation_menu_navigationmenucontent",
+      "src_components_ui_navigation_menu_navigationmenuindicator",
+      "src_components_ui_navigation_menu_navigationmenulist",
+      "src_components_ui_navigation_menu_navigationmenutrigger",
+      "src_components_ui_navigation_menu_navigationmenutriggerstyle",
+      "src_components_ui_navigation_menu_navigationmenuviewport",
+      "src_components_ui_toggle",
+      "src_components_ui_toggle_group",
+      "src_components_ui_toggle_group_togglegroup",
+      "src_components_ui_toggle_group_togglegroupcontext",
+      "src_components_ui_toggle_group_togglegroupitem",
+      "src_components_ui_toggle_toggle",
+      "src_components_ui_toggle_togglevariants"
     ],
-    "7": [
+    "10": [
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_allowimportingtsextensions",
+      "tsconfig_compileroptions_exactoptionalpropertytypes",
+      "tsconfig_compileroptions_jsx",
+      "tsconfig_compileroptions_lib",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_noemit",
+      "tsconfig_compileroptions_nofallthroughcasesinswitch",
+      "tsconfig_compileroptions_noimplicitoverride",
+      "tsconfig_compileroptions_noimplicitreturns",
+      "tsconfig_compileroptions_nopropertyaccessfromindexsignature",
+      "tsconfig_compileroptions_nouncheckedindexedaccess",
+      "tsconfig_compileroptions_nouncheckedsideeffectimports",
+      "tsconfig_compileroptions_nounusedlocals",
+      "tsconfig_compileroptions_nounusedparameters",
+      "tsconfig_compileroptions_paths",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_compileroptions_target",
+      "tsconfig_compileroptions_types",
+      "tsconfig_compileroptions_verbatimmodulesyntax",
+      "tsconfig_include"
+    ],
+    "11": [
+      "ref_tanstack_react_start",
       "server_entry",
       "src_integrations_supabase_auth_attacher",
       "src_integrations_supabase_auth_attacher_attachsupabaseauth",
@@ -339,29 +499,7 @@
       "src_start_csrfmiddleware",
       "src_start_errormiddleware"
     ],
-    "8": [
-      "src_components_logo",
-      "src_components_logo_logo",
-      "src_lib_auth",
-      "src_lib_auth_approle",
-      "src_lib_auth_authcontext",
-      "src_lib_auth_authstate",
-      "src_lib_auth_profile",
-      "src_lib_auth_role_label",
-      "src_lib_auth_useauth",
-      "src_routes_auth_authpage",
-      "src_routes_auth_authpage_entrar",
-      "src_routes_index",
-      "src_routes_index_home",
-      "src_routes_index_route",
-      "src_routes_painel",
-      "src_routes_painel_mobile_keys",
-      "src_routes_painel_nav",
-      "src_routes_painel_navitem",
-      "src_routes_painel_painellayout",
-      "src_routes_painel_route"
-    ],
-    "9": [
+    "12": [
       "components",
       "components_aliases",
       "components_aliases_components",
@@ -382,7 +520,28 @@
       "components_tailwind_prefix",
       "components_tsx"
     ],
-    "10": [
+    "13": [
+      "package_devdependencies",
+      "package_devdependencies_eslint",
+      "package_devdependencies_eslint_config_prettier",
+      "package_devdependencies_eslint_js",
+      "package_devdependencies_eslint_plugin_prettier",
+      "package_devdependencies_eslint_plugin_react_hooks",
+      "package_devdependencies_eslint_plugin_react_refresh",
+      "package_devdependencies_globals",
+      "package_devdependencies_lovable_dev_vite_tanstack_config",
+      "package_devdependencies_nitro",
+      "package_devdependencies_prettier",
+      "package_devdependencies_types_jsbarcode",
+      "package_devdependencies_types_node",
+      "package_devdependencies_types_react",
+      "package_devdependencies_types_react_dom",
+      "package_devdependencies_typescript",
+      "package_devdependencies_typescript_eslint",
+      "package_devdependencies_vite",
+      "package_devdependencies_vitejs_plugin_react"
+    ],
+    "14": [
       "src_lib_comanda_codigo_parsecomandacodigo",
       "src_lib_gaveta",
       "src_lib_gaveta_abrirgaveta",
@@ -403,7 +562,8 @@
       "src_routes_painel_pdv_pdvpage_imprimireabrirgaveta",
       "src_routes_painel_pdv_pdvpage_lercomanda"
     ],
-    "11": [
+    "15": [
+      "ref_radix_ui_react_menubar",
       "src_components_ui_menubar",
       "src_components_ui_menubar_menubar",
       "src_components_ui_menubar_menubarcheckboxitem",
@@ -422,55 +582,9 @@
       "src_components_ui_menubar_menubarsubtrigger",
       "src_components_ui_menubar_menubartrigger"
     ],
-    "12": [
-      "src_components_ui_sonner",
-      "src_components_ui_sonner_toaster",
-      "src_components_ui_sonner_toasterprops",
-      "src_lib_auth_authprovider",
-      "src_lib_auth_authprovider_load",
-      "src_lib_lovable_error_reporting",
-      "src_lib_lovable_error_reporting_lovableerroroptions",
-      "src_lib_lovable_error_reporting_lovableevents",
-      "src_lib_lovable_error_reporting_reportlovableerror",
-      "src_lib_lovable_error_reporting_window",
-      "src_routes_root",
-      "src_routes_root_errorcomponent",
-      "src_routes_root_notfoundcomponent",
-      "src_routes_root_rootcomponent",
-      "src_routes_root_rootshell"
-    ],
-    "13": [
-      "src_components_ui_carousel",
-      "src_components_ui_carousel_carousel",
-      "src_components_ui_carousel_carouselapi",
-      "src_components_ui_carousel_carouselcontent",
-      "src_components_ui_carousel_carouselcontext",
-      "src_components_ui_carousel_carouselcontextprops",
-      "src_components_ui_carousel_carouselitem",
-      "src_components_ui_carousel_carouselnext",
-      "src_components_ui_carousel_carouseloptions",
-      "src_components_ui_carousel_carouselplugin",
-      "src_components_ui_carousel_carouselprevious",
-      "src_components_ui_carousel_carouselprops",
-      "src_components_ui_carousel_usecarousel",
-      "src_components_ui_carousel_usecarouselparameters"
-    ],
-    "14": [
-      "class_variance_authority",
-      "input_otp",
-      "jsbarcode",
-      "package_dependencies",
-      "package_dependencies_class_variance_authority",
-      "package_dependencies_input_otp",
-      "package_dependencies_jsbarcode",
-      "package_dependencies_radix_ui_react_context_menu",
-      "package_dependencies_recharts",
-      "package_dependencies_tanstack_react_start",
-      "radix_ui_react_context_menu",
-      "recharts",
-      "tanstack_react_start"
-    ],
-    "15": [
+    "16": [
+      "ref_radix_ui_react_label",
+      "ref_react_hook_form",
       "src_components_ui_form",
       "src_components_ui_form_formcontrol",
       "src_components_ui_form_formdescription",
@@ -484,20 +598,23 @@
       "src_components_ui_form_formmessage",
       "src_components_ui_form_useformfield"
     ],
-    "16": [
-      "eslint",
-      "globals",
-      "nitro",
-      "package_devdependencies",
-      "package_devdependencies_eslint",
-      "package_devdependencies_globals",
-      "package_devdependencies_nitro",
-      "package_devdependencies_types_jsbarcode",
-      "package_devdependencies_vitejs_plugin_react",
-      "types_jsbarcode",
-      "vitejs_plugin_react"
-    ],
     "17": [
+      "ref_clsx",
+      "ref_radix_ui_react_hover_card",
+      "ref_radix_ui_react_popover",
+      "ref_react_resizable_panels",
+      "ref_tailwind_merge",
+      "src_components_ui_hover_card",
+      "src_components_ui_hover_card_hovercardcontent",
+      "src_components_ui_popover",
+      "src_components_ui_popover_popovercontent",
+      "src_components_ui_resizable",
+      "src_components_ui_resizable_resizablehandle",
+      "src_components_ui_resizable_resizablepanelgroup",
+      "src_lib_utils"
+    ],
+    "18": [
+      "ref_recharts",
       "src_components_ui_chart",
       "src_components_ui_chart_chartconfig",
       "src_components_ui_chart_chartcontainer",
@@ -510,31 +627,21 @@
       "src_components_ui_chart_themes",
       "src_components_ui_chart_usechart"
     ],
-    "18": [
-      "src_components_ui_context_menu",
-      "src_components_ui_context_menu_contextmenucheckboxitem",
-      "src_components_ui_context_menu_contextmenucontent",
-      "src_components_ui_context_menu_contextmenuitem",
-      "src_components_ui_context_menu_contextmenulabel",
-      "src_components_ui_context_menu_contextmenuradioitem",
-      "src_components_ui_context_menu_contextmenuseparator",
-      "src_components_ui_context_menu_contextmenushortcut",
-      "src_components_ui_context_menu_contextmenusubcontent",
-      "src_components_ui_context_menu_contextmenusubtrigger"
-    ],
     "19": [
-      "src_components_ui_dropdown_menu",
-      "src_components_ui_dropdown_menu_dropdownmenucheckboxitem",
-      "src_components_ui_dropdown_menu_dropdownmenucontent",
-      "src_components_ui_dropdown_menu_dropdownmenuitem",
-      "src_components_ui_dropdown_menu_dropdownmenulabel",
-      "src_components_ui_dropdown_menu_dropdownmenuradioitem",
-      "src_components_ui_dropdown_menu_dropdownmenuseparator",
-      "src_components_ui_dropdown_menu_dropdownmenushortcut",
-      "src_components_ui_dropdown_menu_dropdownmenusubcontent",
-      "src_components_ui_dropdown_menu_dropdownmenusubtrigger"
+      "ref_cmdk",
+      "src_components_ui_command",
+      "src_components_ui_command_command",
+      "src_components_ui_command_commanddialog",
+      "src_components_ui_command_commandempty",
+      "src_components_ui_command_commandgroup",
+      "src_components_ui_command_commandinput",
+      "src_components_ui_command_commanditem",
+      "src_components_ui_command_commandlist",
+      "src_components_ui_command_commandseparator",
+      "src_components_ui_command_commandshortcut"
     ],
     "20": [
+      "ref_radix_ui_react_dialog",
       "src_components_ui_sheet",
       "src_components_ui_sheet_sheetcontent",
       "src_components_ui_sheet_sheetcontentprops",
@@ -546,6 +653,7 @@
       "src_components_ui_sheet_sheetvariants"
     ],
     "21": [
+      "ref_radix_ui_react_slot",
       "src_components_ui_breadcrumb",
       "src_components_ui_breadcrumb_breadcrumb",
       "src_components_ui_breadcrumb_breadcrumbellipsis",
@@ -556,6 +664,7 @@
       "src_components_ui_breadcrumb_breadcrumbseparator"
     ],
     "22": [
+      "ref_vaul",
       "src_components_ui_drawer",
       "src_components_ui_drawer_drawer",
       "src_components_ui_drawer_drawercontent",
@@ -566,25 +675,6 @@
       "src_components_ui_drawer_drawertitle"
     ],
     "23": [
-      "src_components_ui_navigation_menu",
-      "src_components_ui_navigation_menu_navigationmenu",
-      "src_components_ui_navigation_menu_navigationmenucontent",
-      "src_components_ui_navigation_menu_navigationmenuindicator",
-      "src_components_ui_navigation_menu_navigationmenulist",
-      "src_components_ui_navigation_menu_navigationmenutrigger",
-      "src_components_ui_navigation_menu_navigationmenutriggerstyle",
-      "src_components_ui_navigation_menu_navigationmenuviewport"
-    ],
-    "24": [
-      "package",
-      "package_name",
-      "package_overrides",
-      "package_overrides_rolldown",
-      "package_private",
-      "package_sideeffects",
-      "package_type"
-    ],
-    "25": [
       "package_scripts",
       "package_scripts_build",
       "package_scripts_build_dev",
@@ -593,415 +683,150 @@
       "package_scripts_lint",
       "package_scripts_preview"
     ],
+    "24": [
+      "src_components_ui_card",
+      "src_components_ui_card_card",
+      "src_components_ui_card_cardcontent",
+      "src_components_ui_card_carddescription",
+      "src_components_ui_card_cardfooter",
+      "src_components_ui_card_cardheader",
+      "src_components_ui_card_cardtitle"
+    ],
+    "25": [
+      "eslint_config",
+      "ref_eslint_js",
+      "ref_eslint_plugin_react_hooks",
+      "ref_eslint_plugin_react_refresh",
+      "ref_globals",
+      "ref_typescript_eslint"
+    ],
     "26": [
-      "src_components_ui_toggle",
-      "src_components_ui_toggle_group",
-      "src_components_ui_toggle_group_togglegroup",
-      "src_components_ui_toggle_group_togglegroupcontext",
-      "src_components_ui_toggle_group_togglegroupitem",
-      "src_components_ui_toggle_toggle",
-      "src_components_ui_toggle_togglevariants"
-    ],
-    "27": [
-      "src_components_ui_alert",
-      "src_components_ui_alert_alert",
-      "src_components_ui_alert_alertdescription",
-      "src_components_ui_alert_alerttitle",
-      "src_components_ui_alert_alertvariants"
-    ],
-    "28": [
+      "ref_input_otp",
       "src_components_ui_input_otp",
       "src_components_ui_input_otp_inputotp",
       "src_components_ui_input_otp_inputotpgroup",
       "src_components_ui_input_otp_inputotpseparator",
       "src_components_ui_input_otp_inputotpslot"
     ],
-    "29": [
-      "src_router",
-      "src_router_getrouter",
-      "src_routetree_gen_register",
-      "src_routetree_gen_routetree",
-      "src_start_startinstance"
-    ],
-    "30": [
+    "27": [
+      "ref_radix_ui_react_accordion",
       "src_components_ui_accordion",
       "src_components_ui_accordion_accordioncontent",
       "src_components_ui_accordion_accordionitem",
       "src_components_ui_accordion_accordiontrigger"
     ],
-    "31": [
+    "28": [
+      "ref_radix_ui_react_avatar",
       "src_components_ui_avatar",
       "src_components_ui_avatar_avatar",
       "src_components_ui_avatar_avatarfallback",
       "src_components_ui_avatar_avatarimage"
     ],
-    "32": [
+    "29": [
+      "ref_radix_ui_react_radio_group",
+      "src_components_ui_radio_group",
+      "src_components_ui_radio_group_radiogroup",
+      "src_components_ui_radio_group_radiogroupitem"
+    ],
+    "30": [
+      "ref_radix_ui_react_scroll_area",
+      "src_components_ui_scroll_area",
+      "src_components_ui_scroll_area_scrollarea",
+      "src_components_ui_scroll_area_scrollbar"
+    ],
+    "31": [
       "node_crypto",
       "src_integrations_supabase_cron_auth",
       "src_integrations_supabase_cron_auth_authenticatecronrequest"
     ],
+    "32": [
+      "ref_radix_ui_react_progress",
+      "src_components_ui_progress",
+      "src_components_ui_progress_progress"
+    ],
     "33": [
-      "clsx",
-      "package_dependencies_clsx"
+      "ref_radix_ui_react_slider",
+      "src_components_ui_slider",
+      "src_components_ui_slider_slider"
     ],
     "34": [
-      "cmdk",
-      "package_dependencies_cmdk"
+      "ref_radix_ui_react_switch",
+      "src_components_ui_switch",
+      "src_components_ui_switch_switch"
     ],
     "35": [
-      "date_fns",
-      "package_dependencies_date_fns"
+      "package_overrides",
+      "package_overrides_rolldown"
     ],
     "36": [
-      "embla_carousel_react",
-      "package_dependencies_embla_carousel_react"
+      "ref_lovable_dev_vite_tanstack_config",
+      "vite_config"
     ],
     "37": [
-      "eslint_config_prettier",
-      "package_devdependencies_eslint_config_prettier"
-    ],
-    "38": [
-      "eslint_js",
-      "package_devdependencies_eslint_js"
-    ],
-    "39": [
-      "eslint_plugin_prettier",
-      "package_devdependencies_eslint_plugin_prettier"
-    ],
-    "40": [
-      "eslint_plugin_react_hooks",
-      "package_devdependencies_eslint_plugin_react_hooks"
-    ],
-    "41": [
-      "eslint_plugin_react_refresh",
-      "package_devdependencies_eslint_plugin_react_refresh"
-    ],
-    "42": [
-      "hookform_resolvers",
-      "package_dependencies_hookform_resolvers"
-    ],
-    "43": [
-      "lovable_dev_vite_tanstack_config",
-      "package_devdependencies_lovable_dev_vite_tanstack_config"
-    ],
-    "44": [
-      "lucide_react",
-      "package_dependencies_lucide_react"
-    ],
-    "45": [
-      "package_dependencies_radix_ui_react_accordion",
-      "radix_ui_react_accordion"
-    ],
-    "46": [
-      "package_dependencies_radix_ui_react_alert_dialog",
-      "radix_ui_react_alert_dialog"
-    ],
-    "47": [
-      "package_dependencies_radix_ui_react_aspect_ratio",
-      "radix_ui_react_aspect_ratio"
-    ],
-    "48": [
-      "package_dependencies_radix_ui_react_avatar",
-      "radix_ui_react_avatar"
-    ],
-    "49": [
-      "package_dependencies_radix_ui_react_checkbox",
-      "radix_ui_react_checkbox"
-    ],
-    "50": [
-      "package_dependencies_radix_ui_react_collapsible",
-      "radix_ui_react_collapsible"
-    ],
-    "51": [
-      "package_dependencies_radix_ui_react_dialog",
-      "radix_ui_react_dialog"
-    ],
-    "52": [
-      "package_dependencies_radix_ui_react_dropdown_menu",
-      "radix_ui_react_dropdown_menu"
-    ],
-    "53": [
-      "package_dependencies_radix_ui_react_hover_card",
-      "radix_ui_react_hover_card"
-    ],
-    "54": [
-      "package_dependencies_radix_ui_react_label",
-      "radix_ui_react_label"
-    ],
-    "55": [
-      "package_dependencies_radix_ui_react_menubar",
-      "radix_ui_react_menubar"
-    ],
-    "56": [
-      "package_dependencies_radix_ui_react_navigation_menu",
-      "radix_ui_react_navigation_menu"
-    ],
-    "57": [
-      "package_dependencies_radix_ui_react_popover",
-      "radix_ui_react_popover"
-    ],
-    "58": [
-      "package_dependencies_radix_ui_react_progress",
-      "radix_ui_react_progress"
-    ],
-    "59": [
-      "package_dependencies_radix_ui_react_radio_group",
-      "radix_ui_react_radio_group"
-    ],
-    "60": [
-      "package_dependencies_radix_ui_react_scroll_area",
-      "radix_ui_react_scroll_area"
-    ],
-    "61": [
-      "package_dependencies_radix_ui_react_select",
-      "radix_ui_react_select"
-    ],
-    "62": [
-      "package_dependencies_radix_ui_react_separator",
-      "radix_ui_react_separator"
-    ],
-    "63": [
-      "package_dependencies_radix_ui_react_slider",
-      "radix_ui_react_slider"
-    ],
-    "64": [
-      "package_dependencies_radix_ui_react_slot",
-      "radix_ui_react_slot"
-    ],
-    "65": [
-      "package_dependencies_radix_ui_react_switch",
-      "radix_ui_react_switch"
-    ],
-    "66": [
-      "package_dependencies_radix_ui_react_tabs",
-      "radix_ui_react_tabs"
-    ],
-    "67": [
-      "package_dependencies_radix_ui_react_toggle",
-      "radix_ui_react_toggle"
-    ],
-    "68": [
-      "package_dependencies_radix_ui_react_toggle_group",
-      "radix_ui_react_toggle_group"
-    ],
-    "69": [
-      "package_dependencies_radix_ui_react_tooltip",
-      "radix_ui_react_tooltip"
-    ],
-    "70": [
-      "package_dependencies_react",
-      "react"
-    ],
-    "71": [
-      "package_dependencies_react_day_picker",
-      "react_day_picker"
-    ],
-    "72": [
-      "package_dependencies_react_dom",
-      "react_dom"
-    ],
-    "73": [
-      "package_dependencies_react_hook_form",
-      "react_hook_form"
-    ],
-    "74": [
-      "package_dependencies_react_resizable_panels",
-      "react_resizable_panels"
-    ],
-    "75": [
-      "package_dependencies_sonner",
-      "sonner"
-    ],
-    "76": [
-      "package_dependencies_supabase_supabase_js",
-      "supabase_supabase_js"
-    ],
-    "77": [
-      "package_dependencies_tailwind_merge",
-      "tailwind_merge"
-    ],
-    "78": [
-      "package_dependencies_tailwindcss",
-      "tailwindcss"
-    ],
-    "79": [
-      "package_dependencies_tailwindcss_vite",
-      "tailwindcss_vite"
-    ],
-    "80": [
-      "package_dependencies_tanstack_react_query",
-      "tanstack_react_query"
-    ],
-    "81": [
-      "package_dependencies_tanstack_react_router",
-      "tanstack_react_router"
-    ],
-    "82": [
-      "package_dependencies_tanstack_router_plugin",
-      "tanstack_router_plugin"
-    ],
-    "83": [
-      "package_dependencies_tw_animate_css",
-      "tw_animate_css"
-    ],
-    "84": [
-      "package_dependencies_vaul",
-      "vaul"
-    ],
-    "85": [
-      "package_dependencies_vite_tsconfig_paths",
-      "vite_tsconfig_paths"
-    ],
-    "86": [
-      "package_dependencies_zod",
-      "zod"
-    ],
-    "87": [
-      "package_devdependencies_prettier",
-      "prettier"
-    ],
-    "88": [
-      "package_devdependencies_types_node",
-      "types_node"
-    ],
-    "89": [
-      "package_devdependencies_types_react",
-      "types_react"
-    ],
-    "90": [
-      "package_devdependencies_types_react_dom",
-      "types_react_dom"
-    ],
-    "91": [
-      "package_devdependencies_typescript",
-      "typescript"
-    ],
-    "92": [
-      "package_devdependencies_typescript_eslint",
-      "typescript_eslint"
-    ],
-    "93": [
-      "package_devdependencies_vite",
-      "vite"
-    ],
-    "94": [
-      "eslint_config"
-    ],
-    "95": [
+      "ref_radix_ui_react_aspect_ratio",
       "src_components_ui_aspect_ratio"
     ],
-    "96": [
+    "38": [
+      "ref_radix_ui_react_collapsible",
       "src_components_ui_collapsible"
-    ],
-    "97": [
-      "vite_config"
     ]
   },
   "cohesion": {
-    "0": 0.05476190476190476,
-    "1": 0.0653061224489796,
-    "2": 0.0748663101604278,
-    "3": 0.0625,
-    "4": 0.09113300492610837,
-    "5": 0.10052910052910052,
-    "6": 0.1067193675889328,
-    "7": 0.1471861471861472,
-    "8": 0.14736842105263157,
-    "9": 0.10526315789473684,
-    "10": 0.16374269005847952,
-    "11": 0.11764705882352941,
-    "12": 0.1619047619047619,
-    "13": 0.18681318681318682,
-    "14": 0.15384615384615385,
-    "15": 0.22727272727272727,
-    "16": 0.18181818181818182,
-    "17": 0.2545454545454545,
-    "18": 0.2,
-    "19": 0.2,
-    "20": 0.25,
-    "21": 0.25,
-    "22": 0.25,
+    "0": 0.05121293800539083,
+    "1": 0.03636363636363636,
+    "2": 0.06620209059233449,
+    "3": 0.08636977058029689,
+    "4": 0.07807807807807808,
+    "5": 0.0748663101604278,
+    "6": 0.11491935483870967,
+    "7": 0.06666666666666667,
+    "8": 0.10098522167487685,
+    "9": 0.10507246376811594,
+    "10": 0.08333333333333333,
+    "11": 0.1422924901185771,
+    "12": 0.10526315789473684,
+    "13": 0.10526315789473684,
+    "14": 0.16374269005847952,
+    "15": 0.1111111111111111,
+    "16": 0.18681318681318682,
+    "17": 0.15384615384615385,
+    "18": 0.22727272727272727,
+    "19": 0.18181818181818182,
+    "20": 0.2222222222222222,
+    "21": 0.2222222222222222,
+    "22": 0.2222222222222222,
     "23": 0.2857142857142857,
     "24": 0.2857142857142857,
-    "25": 0.2857142857142857,
-    "26": 0.42857142857142855,
-    "27": 0.5,
+    "25": 0.3333333333333333,
+    "26": 0.3333333333333333,
+    "27": 0.4,
     "28": 0.4,
-    "29": 0.4,
+    "29": 0.5,
     "30": 0.5,
-    "31": 0.5,
+    "31": 0.6666666666666666,
     "32": 0.6666666666666666,
-    "33": 1.0,
-    "34": 1.0,
+    "33": 0.6666666666666666,
+    "34": 0.6666666666666666,
     "35": 1.0,
     "36": 1.0,
     "37": 1.0,
-    "38": 1.0,
-    "39": 1.0,
-    "40": 1.0,
-    "41": 1.0,
-    "42": 1.0,
-    "43": 1.0,
-    "44": 1.0,
-    "45": 1.0,
-    "46": 1.0,
-    "47": 1.0,
-    "48": 1.0,
-    "49": 1.0,
-    "50": 1.0,
-    "51": 1.0,
-    "52": 1.0,
-    "53": 1.0,
-    "54": 1.0,
-    "55": 1.0,
-    "56": 1.0,
-    "57": 1.0,
-    "58": 1.0,
-    "59": 1.0,
-    "60": 1.0,
-    "61": 1.0,
-    "62": 1.0,
-    "63": 1.0,
-    "64": 1.0,
-    "65": 1.0,
-    "66": 1.0,
-    "67": 1.0,
-    "68": 1.0,
-    "69": 1.0,
-    "70": 1.0,
-    "71": 1.0,
-    "72": 1.0,
-    "73": 1.0,
-    "74": 1.0,
-    "75": 1.0,
-    "76": 1.0,
-    "77": 1.0,
-    "78": 1.0,
-    "79": 1.0,
-    "80": 1.0,
-    "81": 1.0,
-    "82": 1.0,
-    "83": 1.0,
-    "84": 1.0,
-    "85": 1.0,
-    "86": 1.0,
-    "87": 1.0,
-    "88": 1.0,
-    "89": 1.0,
-    "90": 1.0,
-    "91": 1.0,
-    "92": 1.0,
-    "93": 1.0,
-    "94": 1.0,
-    "95": 1.0,
-    "96": 1.0,
-    "97": 1.0
+    "38": 1.0
   },
   "gods": [
     {
       "id": "src_lib_utils_cn",
       "label": "cn()",
       "degree": 230
+    },
+    {
+      "id": "ref_react",
+      "label": "react",
+      "degree": 56
+    },
+    {
+      "id": "ref_lucide_react",
+      "label": "lucide-react",
+      "degree": 29
     },
     {
       "id": "tsconfig_compileroptions",
@@ -1019,6 +844,11 @@
       "degree": 15
     },
     {
+      "id": "ref_tanstack_react_router",
+      "label": "@tanstack/react-router",
+      "degree": 13
+    },
+    {
       "id": "src_lib_auth_useauth",
       "label": "useAuth()",
       "degree": 13
@@ -1032,21 +862,6 @@
       "id": "src_integrations_supabase_client_supabase",
       "label": "supabase",
       "degree": 12
-    },
-    {
-      "id": "src_routetree_gen_fileroutesbypath",
-      "label": "FileRoutesByPath",
-      "degree": 12
-    },
-    {
-      "id": "src_components_ui_label_label",
-      "label": "Label",
-      "degree": 11
-    },
-    {
-      "id": "src_routes_painel_pdv_pdvpage",
-      "label": "PdvPage()",
-      "degree": 11
     }
   ],
   "surprises": [
