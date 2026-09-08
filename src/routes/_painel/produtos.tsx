@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Barcode, Camera, Pencil, Plus, Printer, Search, Trash2 } from "lucide-react";
 
@@ -141,7 +141,13 @@ function ScannerDialog({
           void videoRef.current.play();
         }
         setCameraAtiva(true);
-        const detector = new Detector({ formats: ["ean_13", "ean_8", "code_128", "upc_a", "upc_e"] });
+        let detector: BarcodeDetectorLike;
+        try {
+          detector = new Detector({ formats: ["ean_13", "ean_8", "code_128", "upc_a", "upc_e"] });
+        } catch {
+          setCameraErro("O navegador não conseguiu inicializar o leitor de código por câmera.");
+          return;
+        }
         const detectar = async () => {
           if (!ativo || !videoRef.current) return;
           try {
@@ -187,17 +193,10 @@ function ScannerDialog({
           <div className="overflow-hidden rounded-xl border bg-muted">
             <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline />
           </div>
-          {cameraAtiva ? (
-            <p className="text-center text-sm text-muted-foreground">Aponte a câmera para o código de barras.</p>
-          ) : null}
+          {cameraAtiva ? <p className="text-center text-sm text-muted-foreground">Aponte a câmera para o código de barras.</p> : null}
           {cameraErro ? <p className="text-sm text-muted-foreground">{cameraErro}</p> : null}
           <form onSubmit={enviarManual} className="flex gap-2">
-            <Input
-              value={manual}
-              onChange={(e) => setManual(e.target.value)}
-              placeholder="Digite ou use um leitor USB"
-              autoFocus
-            />
+            <Input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Digite ou use um leitor USB" autoFocus />
             <Button type="submit">Usar código</Button>
           </form>
         </div>
@@ -221,9 +220,7 @@ function ProdutosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select(
-          "id, nome, codigo_interno, codigo_barras, category_id, unidade, preco_venda, custo, estoque_atual, estoque_minimo, ncm, cfop, cst, aliquota, ativo",
-        )
+        .select("id, nome, codigo_interno, codigo_barras, category_id, unidade, preco_venda, custo, estoque_atual, estoque_minimo, ncm, cfop, cst, aliquota, ativo")
         .order("nome");
       if (error) throw error;
       return (data ?? []) as Produto[];
@@ -233,11 +230,7 @@ function ProdutosPage() {
   const categorias = useQuery({
     queryKey: ["categorias"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, nome")
-        .eq("ativo", true)
-        .order("nome");
+      const { data, error } = await supabase.from("categories").select("id, nome").eq("ativo", true).order("nome");
       if (error) throw error;
       return (data ?? []) as Categoria[];
     },
@@ -245,12 +238,8 @@ function ProdutosPage() {
 
   const salvar = useMutation({
     mutationFn: async ({ id, dados }: { id: string | null; dados: ProdutoInput }) => {
-      if (id) {
-        const { error } = await supabase.from("products").update(dados).eq("id", id);
-        if (error) throw error;
-        return;
-      }
-      const { error } = await supabase.from("products").insert(dados);
+      const request = id ? supabase.from("products").update(dados).eq("id", id) : supabase.from("products").insert(dados);
+      const { error } = await request;
       if (error) throw error;
     },
     onSuccess: () => {
@@ -283,10 +272,7 @@ function ProdutosPage() {
       toast.success("Produto excluído");
       void qc.invalidateQueries({ queryKey: ["produtos"] });
     },
-    onError: (e: Error) =>
-      toast.error("Não foi possível excluir", {
-        description: `${e.message} Se o produto já estiver em vendas/comandas, mantenha-o inativo para preservar o histórico.`,
-      }),
+    onError: (e: Error) => toast.error("Não foi possível excluir", { description: `${e.message} Se o produto já estiver em vendas/comandas, mantenha-o inativo para preservar o histórico.` }),
   });
 
   const lista = useMemo(() => {
@@ -294,11 +280,7 @@ function ProdutosPage() {
     return (produtos.data ?? []).filter((p) => {
       if (soAtivos && !p.ativo) return false;
       if (!termo) return true;
-      return (
-        p.nome.toLowerCase().includes(termo) ||
-        (p.codigo_interno ?? "").toLowerCase().includes(termo) ||
-        (p.codigo_barras ?? "").toLowerCase().includes(termo)
-      );
+      return p.nome.toLowerCase().includes(termo) || (p.codigo_interno ?? "").toLowerCase().includes(termo) || (p.codigo_barras ?? "").toLowerCase().includes(termo);
     });
   }, [produtos.data, busca, soAtivos]);
 
@@ -307,7 +289,7 @@ function ProdutosPage() {
     setScannerAberto(true);
   }
 
-  function codigoDetectado(codigo: string) {
+  const codigoDetectado = useCallback((codigo: string) => {
     if (scannerDestino === "busca") {
       setBusca(codigo);
       const produto = (produtos.data ?? []).find((p) => p.codigo_barras === codigo || p.codigo_interno === codigo);
@@ -324,7 +306,7 @@ function ProdutosPage() {
       campo.value = codigo;
       campo.focus();
     }
-  }
+  }, [produtos.data, scannerDestino]);
 
   function imprimir(p: Produto) {
     const resultado = imprimirEtiquetasProduto(
@@ -342,13 +324,11 @@ function ProdutosPage() {
       toast.error("Informe o nome do produto");
       return;
     }
-
     const codigoInformado = String(f.get("codigo_interno") ?? "").trim();
     const codigoInterno = codigoInformado || proximoCodigoInterno((produtos.data ?? []).map((p) => p.codigo_interno));
     const barrasInformado = limparCodigoBarras(String(f.get("codigo_barras") ?? ""));
     const codigoBarras = barrasInformado || gerarEan13(codigoInterno);
     const categoria = String(f.get("category_id") ?? "");
-
     salvar.mutate({
       id: editando?.id ?? null,
       dados: {
@@ -373,94 +353,39 @@ function ProdutosPage() {
       <PageHeader
         title="Produtos"
         description="Cadastro, preços, estoque e códigos dos produtos."
-        actions={
-          isManager ? (
-            <Button
-              className="h-11"
-              onClick={() => {
-                setEditando(null);
-                setAberto(true);
-              }}
-            >
-              <Plus className="size-4" /> Novo produto
-            </Button>
-          ) : null
-        }
+        actions={isManager ? <Button className="h-11" onClick={() => { setEditando(null); setAberto(true); }}><Plus className="size-4" /> Novo produto</Button> : null}
       />
 
       <div className="panel mb-4 flex flex-wrap items-center gap-3 p-4">
         <div className="relative min-w-56 flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome, código ou código de barras"
-            className="h-11 pl-9"
-          />
+          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, código ou código de barras" className="h-11 pl-9" />
         </div>
-        <Button variant="outline" className="h-11" onClick={() => abrirScanner("busca")}>
-          <Barcode className="size-4" /> Ler código
-        </Button>
-        <label className="flex items-center gap-2 px-1 text-sm">
-          <Switch checked={soAtivos} onCheckedChange={setSoAtivos} /> Somente ativos
-        </label>
+        <Button variant="outline" className="h-11" onClick={() => abrirScanner("busca")}><Barcode className="size-4" /> Ler código</Button>
+        <label className="flex items-center gap-2 px-1 text-sm"><Switch checked={soAtivos} onCheckedChange={setSoAtivos} /> Somente ativos</label>
       </div>
 
       {produtos.isLoading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
-        </div>
+        <div className="space-y-2">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>
       ) : lista.length === 0 ? (
-        <EmptyState
-          title="Nenhum produto encontrado"
-          description="Cadastre os produtos da padaria para usar nas comandas e no PDV."
-        />
+        <EmptyState title="Nenhum produto encontrado" description="Cadastre os produtos da padaria para usar nas comandas e no PDV." />
       ) : (
         <div className="panel divide-y divide-border">
           {lista.map((p) => {
             const baixo = Number(p.estoque_minimo) > 0 && Number(p.estoque_atual) <= Number(p.estoque_minimo);
             return (
               <div key={p.id} className="flex flex-wrap items-center gap-3 p-4">
-                <div className="min-w-40 flex-1">
-                  <p className="font-medium">{p.nome}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {p.codigo_interno ? `Cód. ${p.codigo_interno} · ` : ""}
-                    {p.codigo_barras ? `EAN ${p.codigo_barras} · ` : ""}
-                    {p.unidade}
-                  </p>
-                </div>
-                <div className="numeric text-right">
-                  <p className="font-semibold">{brl(p.preco_venda)}</p>
-                  <p className="text-xs text-muted-foreground">custo {brl(p.custo)}</p>
-                </div>
-                <div className="w-28 text-right">
-                  <p className={`numeric font-medium ${baixo ? "text-destructive" : ""}`}>{num(p.estoque_atual, 2)}</p>
-                  <p className="text-xs text-muted-foreground">mín. {num(p.estoque_minimo, 2)}</p>
-                </div>
+                <div className="min-w-40 flex-1"><p className="font-medium">{p.nome}</p><p className="text-xs text-muted-foreground">{p.codigo_interno ? `Cód. ${p.codigo_interno} · ` : ""}{p.codigo_barras ? `EAN ${p.codigo_barras} · ` : ""}{p.unidade}</p></div>
+                <div className="numeric text-right"><p className="font-semibold">{brl(p.preco_venda)}</p><p className="text-xs text-muted-foreground">custo {brl(p.custo)}</p></div>
+                <div className="w-28 text-right"><p className={`numeric font-medium ${baixo ? "text-destructive" : ""}`}>{num(p.estoque_atual, 2)}</p><p className="text-xs text-muted-foreground">mín. {num(p.estoque_minimo, 2)}</p></div>
                 {!p.ativo ? <Badge variant="secondary">Inativo</Badge> : null}
                 {baixo ? <Badge variant="destructive">Estoque baixo</Badge> : null}
                 {isManager ? (
                   <div className="flex gap-2">
-                    <Button variant="outline" size="icon" aria-label={`Editar ${p.nome}`} onClick={() => { setEditando(p); setAberto(true); }}>
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" aria-label={`Imprimir etiqueta de ${p.nome}`} onClick={() => imprimir(p)}>
-                      <Printer className="size-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => alternarStatus.mutate(p)} disabled={alternarStatus.isPending}>
-                      {p.ativo ? "Inativar" : "Ativar"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      aria-label={`Excluir ${p.nome}`}
-                      onClick={() => {
-                        if (window.confirm(`Excluir o produto “${p.nome}”? Esta ação não poderá ser desfeita.`)) excluir.mutate(p);
-                      }}
-                      disabled={excluir.isPending}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
+                    <Button variant="outline" size="icon" aria-label={`Editar ${p.nome}`} onClick={() => { setEditando(p); setAberto(true); }}><Pencil className="size-4" /></Button>
+                    <Button variant="outline" size="icon" aria-label={`Imprimir etiqueta de ${p.nome}`} onClick={() => imprimir(p)}><Printer className="size-4" /></Button>
+                    <Button variant="outline" size="sm" onClick={() => alternarStatus.mutate(p)} disabled={alternarStatus.isPending}>{p.ativo ? "Inativar" : "Ativar"}</Button>
+                    <Button variant="outline" size="icon" aria-label={`Excluir ${p.nome}`} onClick={() => { if (window.confirm(`Excluir o produto “${p.nome}”? Esta ação não poderá ser desfeita.`)) excluir.mutate(p); }} disabled={excluir.isPending}><Trash2 className="size-4" /></Button>
                   </div>
                 ) : null}
               </div>
@@ -469,90 +394,24 @@ function ProdutosPage() {
         </div>
       )}
 
-      <Dialog
-        open={aberto}
-        onOpenChange={(v) => {
-          setAberto(v);
-          if (!v) setEditando(null);
-        }}
-      >
+      <Dialog open={aberto} onOpenChange={(v) => { setAberto(v); if (!v) setEditando(null); }}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-display">{editando ? "Editar produto" : "Novo produto"}</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle className="font-display">{editando ? "Editar produto" : "Novo produto"}</DialogTitle></DialogHeader>
           <form key={editando?.id ?? "novo"} onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="nome">Nome</Label>
-              <Input id="nome" name="nome" defaultValue={editando?.nome ?? ""} required autoFocus />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="codigo_interno">Código interno</Label>
-              <Input id="codigo_interno" name="codigo_interno" defaultValue={editando?.codigo_interno ?? ""} placeholder="Automático se vazio" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="codigo_barras">Código de barras</Label>
-              <div className="flex gap-2">
-                <Input id="codigo_barras" name="codigo_barras" defaultValue={editando?.codigo_barras ?? ""} placeholder="Automático se vazio" />
-                <Button type="button" variant="outline" size="icon" aria-label="Ler código de barras" onClick={() => abrirScanner("formulario")}>
-                  <Camera className="size-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category_id">Categoria</Label>
-              <Select name="category_id" defaultValue={editando?.category_id ?? "sem"}>
-                <SelectTrigger id="category_id"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sem">Sem categoria</SelectItem>
-                  {(categorias.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="unidade">Unidade</Label>
-              <Select name="unidade" defaultValue={editando?.unidade ?? "UN"}>
-                <SelectTrigger id="unidade"><SelectValue /></SelectTrigger>
-                <SelectContent>{UNIDADES.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="preco_venda">Preço de venda</Label>
-              <Input id="preco_venda" name="preco_venda" type="number" step="0.01" min="0" defaultValue={editando?.preco_venda ?? 0} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="custo">Custo</Label>
-              <Input id="custo" name="custo" type="number" step="0.01" min="0" defaultValue={editando?.custo ?? 0} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estoque_minimo">Estoque mínimo</Label>
-              <Input id="estoque_minimo" name="estoque_minimo" type="number" step="0.001" min="0" defaultValue={editando?.estoque_minimo ?? 0} />
-            </div>
-
-            <div className="rounded-xl border bg-muted/30 p-3 sm:col-span-2">
-              <p className="text-sm font-medium">Informações fiscais opcionais</p>
-              <p className="mt-1 text-xs text-muted-foreground">NCM, CFOP, CST/CSOSN e alíquota podem ser preenchidos depois. Nenhum deles bloqueia o cadastro.</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ncm">NCM</Label>
-              <Input id="ncm" name="ncm" defaultValue={editando?.ncm ?? ""} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cfop">CFOP</Label>
-              <Input id="cfop" name="cfop" defaultValue={editando?.cfop ?? ""} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cst">CST / CSOSN</Label>
-              <Input id="cst" name="cst" defaultValue={editando?.cst ?? ""} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="aliquota">Alíquota (%)</Label>
-              <Input id="aliquota" name="aliquota" type="number" step="0.01" min="0" defaultValue={editando?.aliquota ?? ""} />
-            </div>
-            <DialogFooter className="sm:col-span-2">
-              <Button type="submit" className="h-11" disabled={salvar.isPending}>
-                {salvar.isPending ? "Salvando..." : "Salvar produto"}
-              </Button>
-            </DialogFooter>
+            <div className="space-y-2 sm:col-span-2"><Label htmlFor="nome">Nome</Label><Input id="nome" name="nome" defaultValue={editando?.nome ?? ""} required autoFocus /></div>
+            <div className="space-y-2"><Label htmlFor="codigo_interno">Código interno</Label><Input id="codigo_interno" name="codigo_interno" defaultValue={editando?.codigo_interno ?? ""} placeholder="Automático se vazio" /></div>
+            <div className="space-y-2"><Label htmlFor="codigo_barras">Código de barras</Label><div className="flex gap-2"><Input id="codigo_barras" name="codigo_barras" defaultValue={editando?.codigo_barras ?? ""} placeholder="Automático se vazio" /><Button type="button" variant="outline" size="icon" aria-label="Ler código de barras" onClick={() => abrirScanner("formulario")}><Camera className="size-4" /></Button></div></div>
+            <div className="space-y-2"><Label htmlFor="category_id">Categoria</Label><Select name="category_id" defaultValue={editando?.category_id ?? "sem"}><SelectTrigger id="category_id"><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent><SelectItem value="sem">Sem categoria</SelectItem>{(categorias.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label htmlFor="unidade">Unidade</Label><Select name="unidade" defaultValue={editando?.unidade ?? "UN"}><SelectTrigger id="unidade"><SelectValue /></SelectTrigger><SelectContent>{UNIDADES.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label htmlFor="preco_venda">Preço de venda</Label><Input id="preco_venda" name="preco_venda" type="number" step="0.01" min="0" defaultValue={editando?.preco_venda ?? 0} /></div>
+            <div className="space-y-2"><Label htmlFor="custo">Custo</Label><Input id="custo" name="custo" type="number" step="0.01" min="0" defaultValue={editando?.custo ?? 0} /></div>
+            <div className="space-y-2"><Label htmlFor="estoque_minimo">Estoque mínimo</Label><Input id="estoque_minimo" name="estoque_minimo" type="number" step="0.001" min="0" defaultValue={editando?.estoque_minimo ?? 0} /></div>
+            <div className="rounded-xl border bg-muted/30 p-3 sm:col-span-2"><p className="text-sm font-medium">Informações fiscais opcionais</p><p className="mt-1 text-xs text-muted-foreground">NCM, CFOP, CST/CSOSN e alíquota podem ser preenchidos depois. Nenhum deles bloqueia o cadastro.</p></div>
+            <div className="space-y-2"><Label htmlFor="ncm">NCM</Label><Input id="ncm" name="ncm" defaultValue={editando?.ncm ?? ""} /></div>
+            <div className="space-y-2"><Label htmlFor="cfop">CFOP</Label><Input id="cfop" name="cfop" defaultValue={editando?.cfop ?? ""} /></div>
+            <div className="space-y-2"><Label htmlFor="cst">CST / CSOSN</Label><Input id="cst" name="cst" defaultValue={editando?.cst ?? ""} /></div>
+            <div className="space-y-2"><Label htmlFor="aliquota">Alíquota (%)</Label><Input id="aliquota" name="aliquota" type="number" step="0.01" min="0" defaultValue={editando?.aliquota ?? ""} /></div>
+            <DialogFooter className="sm:col-span-2"><Button type="submit" className="h-11" disabled={salvar.isPending}>{salvar.isPending ? "Salvando..." : "Salvar produto"}</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
