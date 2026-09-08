@@ -193,6 +193,16 @@ a[href*="lovable.app?utm"],
   pointer-events: none !important;
 }
 
+/* O cadastro de produtos não exibe campos fiscais. Eles permanecem no banco
+ * para compatibilidade com dados existentes e integrações futuras. */
+form:has(#ncm) > div:has(#ncm),
+form:has(#ncm) > div:has(#cfop),
+form:has(#ncm) > div:has(#cst),
+form:has(#ncm) > div:has(#aliquota),
+form:has(#ncm) > div:nth-child(9) {
+  display: none !important;
+}
+
 /* Impressão de cupom: somente o comprovante vai para a bobina/PDF de 80 mm. */
 @page {
   size: 80mm auto;
