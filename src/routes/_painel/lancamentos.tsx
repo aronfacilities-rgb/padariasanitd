@@ -177,7 +177,7 @@ function LancamentosPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="categoria">Categoria</Label>
-                  <Select name="categoria" required value={undefined} defaultValue={categorias[0]}>
+                  <Select name="categoria" required defaultValue={categorias[0]}>
                     <SelectTrigger id="categoria">
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>

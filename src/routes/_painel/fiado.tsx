@@ -29,7 +29,7 @@ function FiadoPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Receivable | null>(null);
-  const [payment, setPayment] = useState({ valor: "", forma: "dinheiro" });
+  const [payment, setPayment] = useState<{ valor: string; forma: "dinheiro" | "pix" | "debito" | "credito" | "fiado" | "outros" }>({ valor: "", forma: "dinheiro" });
 
   const customers = useQuery({ queryKey: ["clientes-fiado"], queryFn: async () => {
     const { data, error } = await supabase.from("customers").select("id,nome,telefone,limite_credito,ativo").eq("ativo", true).order("nome");
