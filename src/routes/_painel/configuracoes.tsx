@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Barcode, Info, Loader2, Pencil, Printer, Save, Trash2, UserPlus } from "lucide-react";
+import { Barcode, Loader2, Pencil, Printer, Save, Trash2, UserPlus } from "lucide-react";
 import JsBarcode from "jsbarcode";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
