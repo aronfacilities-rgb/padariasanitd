@@ -276,7 +276,7 @@ function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void 
               ) : (
                 <form className="space-y-3" onSubmit={(e) => {
                   e.preventDefault();
-                  if (!nomeAvulso.trim() || !precoAvulso) return toast.error("Preencha o nome e o valor do item");
+                  if (!nomeAvulso.trim() || !precoAvulso) { toast.error("Preencha o nome e o valor do item"); return; }
                   adicionar.mutate({ product_id: null, nome: nomeAvulso.trim(), preco_venda: Number(precoAvulso.replace(",", ".")) });
                 }}>
                   <div className="grid grid-cols-[1fr_100px] gap-2">

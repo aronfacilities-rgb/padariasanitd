@@ -799,6 +799,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_cash_closing: {
+        Args: { _cash_register_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
