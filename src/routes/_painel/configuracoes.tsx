@@ -153,9 +153,7 @@ function Funcionarios() {
       if (profileError) throw profileError;
       const { error: roleError } = await supabase.from("user_roles").insert({ user_id: data.user.id, role: role as never });
       if (roleError) throw roleError;
-      
-      const aviso = !data.session ? " Verifique se 'Confirm email' está desativado no Supabase para login imediato." : "";
-      toast.success("Funcionário cadastrado", { description: `A conta foi criada com a senha informada.${aviso}` });
+      toast.success("Funcionário cadastrado", { description: "A conta já está ativa e pode entrar com a senha informada." });
     }
     limpar();
     await qc.invalidateQueries({ queryKey: ["funcionarios"] });
@@ -189,13 +187,6 @@ function Funcionarios() {
 
   return (
     <div className="space-y-4">
-      <Alert className="border-blue-500/20 bg-blue-500/10 text-blue-900 dark:text-blue-200">
-        <Info className="size-4" />
-        <AlertTitle>Acesso imediato sem confirmação de e-mail</AlertTitle>
-        <AlertDescription>
-          Para que o cadastro funcione livre da obrigatoriedade de verificar a caixa de entrada, clique na engrenagem no painel esquerdo superior (Settings / Supabase Provider), vá até <strong>Authentication &gt; Providers &gt; Email</strong> e desative a opção <strong>Confirm email</strong>. Caso contrário, enviaremos um link de confirmação para o e-mail cadastrado.
-        </AlertDescription>
-      </Alert>
 
       <div className="panel space-y-3 p-4">
         <div className="flex items-center gap-2">
