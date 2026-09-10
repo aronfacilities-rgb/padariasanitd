@@ -34,7 +34,8 @@ function PainelLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
-  const isAtendenteRestricted = roles.includes("atendente") && !roles.includes("admin") && !roles.includes("gerente");
+  const isAtendenteRestricted =
+    roles.includes("atendente") && !roles.includes("admin") && !roles.includes("gerente");
 
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
@@ -42,7 +43,13 @@ function PainelLayout() {
 
   useEffect(() => {
     if (loading || !session || !isAtendenteRestricted) return;
-    const allowed = ATENDENTE_ALLOWED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
+    const allowed = ATENDENTE_ALLOWED_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`),
+    );
+
+    // Atendentes só podem acessar Comandas, Produtos e Clientes.
+    // Isso também impede acesso direto à Dashboard e às áreas financeiras.
     if (!allowed) void navigate({ to: "/comandas", replace: true });
   }, [loading, session, isAtendenteRestricted, pathname, navigate]);
 
