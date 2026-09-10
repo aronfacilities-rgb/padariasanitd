@@ -34,16 +34,17 @@ function PainelLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
+  const isAtendenteRestricted = roles.includes("atendente") && !roles.includes("admin") && !roles.includes("gerente");
 
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
 
   useEffect(() => {
-    if (loading || !session || !roles.includes("atendente")) return;
+    if (loading || !session || !isAtendenteRestricted) return;
     const allowed = ATENDENTE_ALLOWED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
     if (!allowed) void navigate({ to: "/comandas", replace: true });
-  }, [loading, session, roles, pathname, navigate]);
+  }, [loading, session, isAtendenteRestricted, pathname, navigate]);
 
   const visible = NAV.filter((item) => !item.roles || item.roles.some((r) => roles.includes(r)));
   const mobileItems = visible.filter((i) => MOBILE_KEYS.includes(i.to)).slice(0, 4);
