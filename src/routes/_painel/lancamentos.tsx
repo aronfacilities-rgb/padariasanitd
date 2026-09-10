@@ -172,7 +172,7 @@ function LancamentosPage() {
 
   const alterarTipo = (novoTipo: Tipo) => {
     setTipo(novoTipo);
-    setCategoria(novoTipo === "entrada" ? CATEGORIAS_ENTRADA[0] : CATEGORIAS_SAIDA[0]);
+    setCategoria((novoTipo === "entrada" ? CATEGORIAS_ENTRADA[0] : CATEGORIAS_SAIDA[0]) ?? "");
   };
 
   const confirmarExclusao = (l: Lancamento) => {
