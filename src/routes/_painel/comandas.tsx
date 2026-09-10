@@ -37,6 +37,9 @@ function ComandasPage() {
 
 function ComandaSheet({ id, onClose }: { id: string | null; onClose: () => void }) {
   const qc = useQueryClient(); const [busca, setBusca] = useState(""); const [nomeAvulso, setNomeAvulso] = useState(""); const [precoAvulso, setPrecoAvulso] = useState(""); const [modo, setModo] = useState<"busca" | "avulso">("busca"); const [codigoBalanca, setCodigoBalanca] = useState("");
+  const buscaRef = useRef<HTMLInputElement>(null);
+  function focarBusca() { requestAnimationFrame(() => { const el = buscaRef.current; if (!el) return; el.focus(); el.select(); }); }
+  useEffect(() => { if (id && modo === "busca") focarBusca(); }, [id, modo]);
   const comanda = useQuery({ queryKey: ["comanda", id], enabled: !!id, queryFn: async () => { const { data, error } = await supabase.from("commands").select("id,numero,status,total,observacao,created_at,aberto_por").eq("id", id!).single(); if (error) throw error; return data as Comanda; } });
   const itens = useQuery({ queryKey: ["comanda-itens", id], enabled: !!id, queryFn: async () => { const { data, error } = await supabase.from("command_items").select("id,nome,quantidade,preco_unitario,observacao,plu,codigo_etiqueta,peso,preco_kg,valor_etiqueta,valor_calculado").eq("command_id", id!).order("created_at"); if (error) throw error; return (data ?? []) as Item[]; } });
   const produtos = useQuery({ queryKey: ["produtos-ativos"], queryFn: async () => { const { data, error } = await supabase.from("products").select("id,nome,preco_venda,preco_kg,tipo_venda,unidade,codigo_interno,codigo_barras,plu,ativo").eq("ativo", true).order("nome"); if (error) throw error; return (data ?? []) as ProdutoBusca[]; } });
