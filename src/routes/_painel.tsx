@@ -42,7 +42,8 @@ function PainelLayout() {
   }, [loading, session, navigate]);
 
   useEffect(() => {
-    if (loading || !session || !roles.length || !visible.length) return;
+    const primeira = visible[0];
+    if (loading || !session || !roles.length || !primeira) return;
 
     const allowed = visible.some(
       (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
@@ -50,7 +51,7 @@ function PainelLayout() {
 
     // Qualquer área fora das permissões do papel (ex.: Dashboard, Caixa,
     // Relatórios para atendente) redireciona para a primeira área liberada.
-    if (!allowed) void navigate({ to: visible[0].to, replace: true });
+    if (!allowed) void navigate({ to: primeira.to, replace: true });
   }, [loading, session, roles.length, visible, pathname, navigate]);
   const mobileItems = visible.filter((i) => MOBILE_KEYS.includes(i.to)).slice(0, 4);
 
