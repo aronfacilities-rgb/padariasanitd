@@ -27,11 +27,13 @@ const CATEGORIAS_SAIDA = ["Sangria de Caixa", "Pagamento de Fornecedor", "Despes
 const FORMAS_PAGAMENTO = [
   { value: "dinheiro", label: "Dinheiro" },
   { value: "pix", label: "PIX" },
-  { value: "cartao_debito", label: "Cartão de Débito" },
-  { value: "cartao_credito", label: "Cartão de Crédito" },
+  { value: "debito", label: "Cartão de Débito" },
+  { value: "credito", label: "Cartão de Crédito" },
 ];
 
 type Tipo = "entrada" | "saida";
+
+type FormaPagamento = "dinheiro" | "pix" | "debito" | "credito" | "fiado" | "outros";
 
 type Lancamento = {
   id: string;
@@ -46,8 +48,8 @@ type Lancamento = {
 function LancamentosPage() {
   const [tipo, setTipo] = useState<Tipo>("entrada");
   const [aba, setAba] = useState("novo");
-  const [categoria, setCategoria] = useState(CATEGORIAS_ENTRADA[0]);
-  const [formaPagamento, setFormaPagamento] = useState("dinheiro");
+  const [categoria, setCategoria] = useState<string>(CATEGORIAS_ENTRADA[0] ?? "");
+  const [formaPagamento, setFormaPagamento] = useState<FormaPagamento>("dinheiro");
   const [valor, setValor] = useState("");
   const [descricao, setDescricao] = useState("");
   const [busca, setBusca] = useState("");
@@ -101,7 +103,7 @@ function LancamentosPage() {
         tipo: Tipo;
         categoria: string;
         valor: number;
-        forma_pagamento: string;
+        forma_pagamento: FormaPagamento;
         descricao: string | null;
         user_id: string;
         cash_register_id?: string;
@@ -170,7 +172,7 @@ function LancamentosPage() {
 
   const alterarTipo = (novoTipo: Tipo) => {
     setTipo(novoTipo);
-    setCategoria(novoTipo === "entrada" ? CATEGORIAS_ENTRADA[0] : CATEGORIAS_SAIDA[0]);
+    setCategoria((novoTipo === "entrada" ? CATEGORIAS_ENTRADA[0] : CATEGORIAS_SAIDA[0]) ?? "");
   };
 
   const confirmarExclusao = (l: Lancamento) => {
@@ -235,7 +237,7 @@ function LancamentosPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="forma_pagamento">Forma de Pagamento</Label>
-                  <Select value={formaPagamento} onValueChange={setFormaPagamento}>
+                  <Select value={formaPagamento} onValueChange={(v) => setFormaPagamento(v as FormaPagamento)}>
                     <SelectTrigger id="forma_pagamento"><SelectValue placeholder="Selecione..." /></SelectTrigger>
                     <SelectContent>
                       {FORMAS_PAGAMENTO.map((f) => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
