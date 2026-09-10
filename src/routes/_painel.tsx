@@ -27,33 +27,32 @@ const NAV: NavItem[] = [
 ];
 
 const MOBILE_KEYS = ["/comandas", "/pdv", "/produtos", "/clientes"];
-const ATENDENTE_ALLOWED_ROUTES = ["/comandas", "/produtos", "/clientes"];
 
 function PainelLayout() {
   const { session, loading, profile, roles, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
-  const isAtendenteRestricted =
-    roles.includes("atendente") && !roles.includes("admin") && !roles.includes("gerente");
+
+  // Estado derivado: áreas liberadas para os papéis do usuário logado.
+  const visible = NAV.filter((item) => !item.roles || item.roles.some((r) => roles.includes(r)));
 
   useEffect(() => {
     if (!loading && !session) void navigate({ to: "/auth" });
   }, [loading, session, navigate]);
 
   useEffect(() => {
-    if (loading || !session || !isAtendenteRestricted) return;
+    const primeira = visible[0];
+    if (loading || !session || !roles.length || !primeira) return;
 
-    const allowed = ATENDENTE_ALLOWED_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(`${route}/`),
+    const allowed = visible.some(
+      (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
     );
 
-    // Atendentes só podem acessar Comandas, Produtos e Clientes.
-    // Isso também impede acesso direto à Dashboard e às áreas financeiras.
-    if (!allowed) void navigate({ to: "/comandas", replace: true });
-  }, [loading, session, isAtendenteRestricted, pathname, navigate]);
-
-  const visible = NAV.filter((item) => !item.roles || item.roles.some((r) => roles.includes(r)));
+    // Qualquer área fora das permissões do papel (ex.: Dashboard, Caixa,
+    // Relatórios para atendente) redireciona para a primeira área liberada.
+    if (!allowed) void navigate({ to: primeira.to, replace: true });
+  }, [loading, session, roles.length, visible, pathname, navigate]);
   const mobileItems = visible.filter((i) => MOBILE_KEYS.includes(i.to)).slice(0, 4);
 
   if (loading || !session) return <div className="flex min-h-screen items-center justify-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
