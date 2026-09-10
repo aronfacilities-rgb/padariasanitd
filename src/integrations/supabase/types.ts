@@ -193,37 +193,55 @@ export type Database = {
       }
       command_items: {
         Row: {
+          codigo_etiqueta: string | null
           command_id: string
           created_at: string
           id: string
           nome: string
           observacao: string | null
+          peso: number | null
+          plu: string | null
+          preco_kg: number | null
           preco_unitario: number
           product_id: string | null
           quantidade: number
           user_id: string | null
+          valor_calculado: number | null
+          valor_etiqueta: number | null
         }
         Insert: {
+          codigo_etiqueta?: string | null
           command_id: string
           created_at?: string
           id?: string
           nome: string
           observacao?: string | null
+          peso?: number | null
+          plu?: string | null
+          preco_kg?: number | null
           preco_unitario?: number
           product_id?: string | null
           quantidade?: number
           user_id?: string | null
+          valor_calculado?: number | null
+          valor_etiqueta?: number | null
         }
         Update: {
+          codigo_etiqueta?: string | null
           command_id?: string
           created_at?: string
           id?: string
           nome?: string
           observacao?: string | null
+          peso?: number | null
+          plu?: string | null
+          preco_kg?: number | null
           preco_unitario?: number
           product_id?: string | null
           quantidade?: number
           user_id?: string | null
+          valor_calculado?: number | null
+          valor_etiqueta?: number | null
         }
         Relationships: [
           {
@@ -454,7 +472,10 @@ export type Database = {
           id: string
           ncm: string | null
           nome: string
+          plu: string | null
+          preco_kg: number | null
           preco_venda: number
+          tipo_venda: string
           unidade: string
           updated_at: string
         }
@@ -474,7 +495,10 @@ export type Database = {
           id?: string
           ncm?: string | null
           nome: string
+          plu?: string | null
+          preco_kg?: number | null
           preco_venda?: number
+          tipo_venda?: string
           unidade?: string
           updated_at?: string
         }
@@ -494,7 +518,10 @@ export type Database = {
           id?: string
           ncm?: string | null
           nome?: string
+          plu?: string | null
+          preco_kg?: number | null
           preco_venda?: number
+          tipo_venda?: string
           unidade?: string
           updated_at?: string
         }
@@ -594,34 +621,52 @@ export type Database = {
       }
       sale_items: {
         Row: {
+          codigo_etiqueta: string | null
           created_at: string
           id: string
           nome: string
+          peso: number | null
+          plu: string | null
+          preco_kg: number | null
           preco_unitario: number
           product_id: string | null
           quantidade: number
           sale_id: string
           total: number
+          valor_calculado: number | null
+          valor_etiqueta: number | null
         }
         Insert: {
+          codigo_etiqueta?: string | null
           created_at?: string
           id?: string
           nome: string
+          peso?: number | null
+          plu?: string | null
+          preco_kg?: number | null
           preco_unitario?: number
           product_id?: string | null
           quantidade?: number
           sale_id: string
           total?: number
+          valor_calculado?: number | null
+          valor_etiqueta?: number | null
         }
         Update: {
+          codigo_etiqueta?: string | null
           created_at?: string
           id?: string
           nome?: string
+          peso?: number | null
+          plu?: string | null
+          preco_kg?: number | null
           preco_unitario?: number
           product_id?: string | null
           quantidade?: number
           sale_id?: string
           total?: number
+          valor_calculado?: number | null
+          valor_etiqueta?: number | null
         }
         Relationships: [
           {
@@ -810,9 +855,25 @@ export type Database = {
         }
         Returns: boolean
       }
+      interpretar_codigo_balanca: {
+        Args: { _codigo: string }
+        Returns: {
+          casas_decimais: number
+          codigo: string
+          digito_verificador: number
+          mensagem: string
+          plu: string
+          prefixo: string
+          tipo: string
+          valido: boolean
+          valor_etiqueta: number
+          valor_inteiro: number
+        }[]
+      }
       is_manager: { Args: { _user_id: string }; Returns: boolean }
       is_operator: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      validar_ean13: { Args: { _codigo: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "gerente" | "caixa" | "atendente" | "funcionario"
