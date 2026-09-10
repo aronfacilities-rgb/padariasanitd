@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PainelRouteImport } from './routes/_painel'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PainelBalancaRouteImport } from './routes/_painel/balanca'
 import { Route as PainelCaixaRouteImport } from './routes/_painel/caixa'
 import { Route as PainelClientesRouteImport } from './routes/_painel/clientes'
 import { Route as PainelComandasRouteImport } from './routes/_painel/comandas'
@@ -37,6 +38,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PainelBalancaRoute = PainelBalancaRouteImport.update({
+  id: '/balanca',
+  path: '/balanca',
+  getParentRoute: () => PainelRoute,
 } as any)
 const PainelCaixaRoute = PainelCaixaRouteImport.update({
   id: '/caixa',
@@ -97,6 +103,7 @@ const PainelRelatoriosRoute = PainelRelatoriosRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/balanca': typeof PainelBalancaRoute
   '/caixa': typeof PainelCaixaRoute
   '/clientes': typeof PainelClientesRoute
   '/comandas': typeof PainelComandasRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/balanca': typeof PainelBalancaRoute
   '/caixa': typeof PainelCaixaRoute
   '/clientes': typeof PainelClientesRoute
   '/comandas': typeof PainelComandasRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_painel': typeof PainelRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_painel/balanca': typeof PainelBalancaRoute
   '/_painel/caixa': typeof PainelCaixaRoute
   '/_painel/clientes': typeof PainelClientesRoute
   '/_painel/comandas': typeof PainelComandasRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/balanca'
     | '/caixa'
     | '/clientes'
     | '/comandas'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/balanca'
     | '/caixa'
     | '/clientes'
     | '/comandas'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_painel'
     | '/auth'
+    | '/_painel/balanca'
     | '/_painel/caixa'
     | '/_painel/clientes'
     | '/_painel/comandas'
@@ -218,6 +230,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_painel/balanca': {
+      id: '/_painel/balanca'
+      path: '/balanca'
+      fullPath: '/balanca'
+      preLoaderRoute: typeof PainelBalancaRouteImport
+      parentRoute: typeof PainelRoute
     }
     '/_painel/caixa': {
       id: '/_painel/caixa'
@@ -300,6 +319,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface PainelRouteChildren {
+  PainelBalancaRoute: typeof PainelBalancaRoute
   PainelCaixaRoute: typeof PainelCaixaRoute
   PainelClientesRoute: typeof PainelClientesRoute
   PainelComandasRoute: typeof PainelComandasRoute
@@ -314,6 +334,7 @@ interface PainelRouteChildren {
 }
 
 const PainelRouteChildren: PainelRouteChildren = {
+  PainelBalancaRoute: PainelBalancaRoute,
   PainelCaixaRoute: PainelCaixaRoute,
   PainelClientesRoute: PainelClientesRoute,
   PainelComandasRoute: PainelComandasRoute,
