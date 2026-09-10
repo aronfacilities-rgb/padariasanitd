@@ -70,7 +70,7 @@ function ScannerDialog({ open, onOpenChange, onDetected }: { open: boolean; onOp
 }
 
 function ProdutosPage() {
-  const { isManager } = useAuth(); const qc = useQueryClient();
+  const { isManager, isOperator } = useAuth(); const qc = useQueryClient();
   const [busca, setBusca] = useState(""); const [soAtivos, setSoAtivos] = useState(true); const [editando, setEditando] = useState<Produto | null>(null); const [aberto, setAberto] = useState(false); const [scannerAberto, setScannerAberto] = useState(false);
   const produtos = useQuery({ queryKey: ["produtos"], queryFn: async () => { const { data, error } = await supabase.from("products").select("id,nome,codigo_interno,codigo_barras,category_id,unidade,preco_venda,preco_kg,tipo_venda,plu,custo,estoque_atual,estoque_minimo,ncm,cfop,cst,aliquota,ativo").order("nome"); if (error) throw error; return (data ?? []) as Produto[]; } });
   const categorias = useQuery({ queryKey: ["categorias"], queryFn: async () => { const { data, error } = await supabase.from("categories").select("id,nome").eq("ativo", true).order("nome"); if (error) throw error; return (data ?? []) as Categoria[]; } });
